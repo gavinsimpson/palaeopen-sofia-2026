@@ -30,6 +30,12 @@ knitr:
 highlight-style: github-dark
 ---
 
+## GitHub Repo
+
+Open the GitHub repo in your browser
+
+### github.com/gavinsimpson/palaeopen-sofia-2026
+
 ## Create a folder
 
 Using your file manager
