@@ -5,6 +5,7 @@ format:
   revealjs:
     theme: [simple, styles.scss]
     embed-resources: true
+    code-line-numbers: false
 revealjs-plugins:
   - tldraw
 html-math-method:

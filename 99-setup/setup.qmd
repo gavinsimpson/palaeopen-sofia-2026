@@ -3,8 +3,8 @@ title: PalaeOpen Training School
 subtitle: Setup
 format:
   revealjs:
-    theme: [simple, styles.scss]
-    embed-resources: true
+    theme: simple
+    code-line-numbers: false
 html-math-method:
   method: mathjax
   url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -21,7 +21,7 @@ presenter:
   institute: Department of Animal & Veterinary Sciences
 knitr:
   opts_chunk: 
-    echo: false
+    echo: true
     message: false
     fig.align: center
     fig.height: 6
