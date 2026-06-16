@@ -8,3 +8,12 @@ Unless otherwise stated, all teaching materials in this repository are copyright
 
 Unless stated otherwise, all training materials in this repository are licensed under a Creative Commons By Attribution Non-commercial 4.0 International licence. See the `LICENSE.md` file for details regarding re-use of these materials.
 
+## Materials
+
+* [Setup and accessing materials](https://gavinsimpson.github.io/palaeopen-sofia-2026/99-setup/setup.html)
+
+### Tuesday
+
+* Slides on [Ordination](https://gavinsimpson.github.io/palaeopen-sofia-2026/01-ordination/ordination.html) methods
+
+* [Ordination exercise](https://gavinsimpson.github.io/palaeopen-sofia-2026/01-ordination/exercise.html)
