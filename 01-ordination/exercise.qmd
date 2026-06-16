@@ -1,0 +1,705 @@
+---
+title: "PalaeoOpen ordination exercise"
+author: "Gavin L. Simpson"
+format:
+  html:
+    toc: true
+    html-math-method: katex
+    embed-resources: true
+    monobackgroundcolor: white
+knitr:
+  opts_chunk: 
+    echo: true
+    fig.align: center
+    collapse: true
+highlight-style: github-dark
+---
+
+## Ordinaton
+
+In this exercise you'll explore a multiproxy data set from Prášilské jezero, a glacial cirque lake, Czechia.
+
+### Getting started
+
+As I haven't taken the training for the *neotoma2* R package, I downloaded the CSV files from the Neotoma Explorer. This will require us to do some data wrangling and also to work around a bug in the way the Explorer writes the CSV files.
+
+We'll begin by installing some packages before we proceed to the data wrangling.
+
+#### Installing required packages
+
+We need a few packages. If you have all of these packages installed, please make sure they are updated to the latest version by running `update.packages(ask = FALSE, checkBuilt = TRUE)`.
+
+```{r}
+inst_pkgs <- c(
+  "here", "vegan", "cocorresp", "readr", "dplyr", "tidyr", "stringr",
+  "janitor", "tidyverse"
+)
+```
+
+You can use the newer *pak* package to install the packages and relevant dependencies. This is useful for installing from GitHub repositories etc. If you just want to use the plain base R option, skip to Option 2.
+
+##### Option 1
+
+First, check if you have *pak* installed; the code below tries to load the package and if it isn't installed, it tries to install it.
+
+```{r}
+#| label: install-pak
+#| eval: false
+if (!requireNamespace("pak", quietly = TRUE)) {install.packages("pak")}
+```
+
+Assuming that worked successfully, you can now use *pak* to install the required packages:
+
+```{r}
+#| label: install-pkgs
+#| eval: false
+pak::pak(inst_pkgs)
+```
+
+or
+
+##### Option 2
+
+This uses the standard installer to install the required packages
+
+```{r}
+#| label: install-alt
+#| eval: false
+install.packages(inst_pkgs)
+```
+
+#### Loading packages for use in exercise
+
+Having installed the packages, we need to load them into our R session to use them. Here I am just loading some of the packages we installed earlier.
+
+```{r}
+#| label: load-pkgs
+pkgs <- inst_pkgs[1:7] # only load some now
+vapply(
+  pkgs,
+  FUN = library,
+  FUN.VALUE = logical(1),
+  character.only = TRUE,
+  logical.return = TRUE
+)
+```
+
+`vapply()` is an R function that will interate over the elements of `pkgs` and call the `library()` function to load each of the selected packages.
+
+#### Load the data
+
+Buckle up; you're about to get your hands dirty with a lot of data wrangling code. Please don't type out all of this stuff; use the copy icon in the upper-right of each code block.
+
+We will load the diatom, pollen, and chironomid data from the lake.
+
+##### Diatoms
+
+To load the diatom data, we read them from the CSV file I downloaded from Neotoma using the Explorer, and remove some of the columns that we don't need.
+
+```{r}
+#| label: load-diatoms
+diatoms <- read_csv(
+  here("00-data/dataset55585_site26991.csv")
+) |>
+  select(!c(group, element, units, context))
+```
+
+Print the data we downloaded; you should note that this is stored as a *tibble*, a fancy data frame, and that only 10 rows are shown, and only as many columns as can be fitted into the width of the R console.
+
+```{r}
+diatoms
+```
+
+Currently, the data are in a wide format, but are transposed relative to the requirements of *vegan* and also of the math. We use `pivot_longer()` to reshape the data into a long format.
+```{r}
+#| label: diat-to-long
+diat_long <- diatoms |>
+  pivot_longer(
+    cols = !name,
+    names_to = "identifier",
+    values_to = "value"
+  )
+```
+
+Some of the data in the file is metadata; we will extract these variables into their own object to allow us to create an object that only contains the diatom counts.
+
+```{r}
+#| label: diat-create-meta
+diat_meta <- diat_long |>
+  filter(                 # extract the named variables
+    name %in% c(
+      "AnalysisUnitName", "Depth", "Thickness", "Sample Name", "Sample ID",
+      "Updated Carter et al. 2018"
+    )
+  ) |>
+  mutate(                 # change the names of some variables for ease of use
+    name = replace_values(
+      name,
+      "Updated Carter et al. 2018" ~ "calibrated_age",
+      "Depth" ~ "depth_cm",
+      "Thickness" ~ "thickness_cm",
+    )
+  ) |>              # make these data wide, one column per variable again
+  pivot_wider(
+    id_cols = identifier,
+    names_from = name,
+    values_from = value
+  ) |>
+  janitor::clean_names() # clean the names for ease of use
+```
+
+A final step for the metadata is remove some redundant columns, and then to clean up the calibrated age column, which is formatted `lower/point/upper`, but if the uncertainty interval is missing, this becomes `--/point/--`. We will just extract the point age estimate here, which requires us to strip out the `--/` and `/--` parts of the string and then convert the variables to numeric format.
+```{r}
+#| label: diat-clean-ages
+diat_meta <- diat_meta |>
+  select(
+    !c(analysis_unit_name, sample_name)
+  ) |>
+  mutate(
+    calibrated_age = str_replace( # remove the lower interval
+      calibrated_age, "^--/", ""
+    ),
+    calibrated_age = str_replace(
+      calibrated_age, "/--$", ""  # remove the upper interval
+    ),
+    across(                       # convert some to numeric
+      c(depth_cm, thickness_cm, calibrated_age),
+      .fns = ~ as.numeric(.x)
+    )
+  ) |>
+  arrange(depth_cm)               # order by depth
+```
+
+Take a look at what you have created
+```{r}
+diat_meta
+```
+
+Now we return to the diatom data which is in the long format. First we remove the metadata columns we just handled
+```{r}
+diat_long <- diat_long |>
+  filter_out(
+    name %in% c(
+      "AnalysisUnitName", "Depth", "Thickness", "Sample Name", "Sample ID",
+      "Updated Carter et al. 2018"
+    )
+  )
+```
+
+Next, we convert the `value` column to numeric and replace `NA` with 0 count, before reshaping the data to the wide format again (`pivot_wider()`), but now with the taxa as the columns, not the samples.
+```{r}
+diat_wide <- diat_long |>
+  mutate(
+    value = as.numeric(value),
+    value = replace_na(value, replace = 0)
+  ) |>
+  pivot_wider(           # pivot! long --> wide
+    id_cols = identifier,
+    names_from = name,
+    values_from = value
+  ) |>
+  janitor::clean_names() # clean variables names
+```
+
+Now we have the data in a wide format, we need to et the data in a common order. Here I temporarily join the data with the metatdata (`diat_meta()`), arrnage by `depth_cm` and then remove the none taxa columns
+```{r}
+diat_wide <- diat_wide |>
+  left_join(
+    diat_meta, by = "identifier"
+  ) |>
+  arrange(depth_cm) |>
+  select(identifier:aff_nupela)
+```
+
+Finally, *vegan* is old-school and sticks closely to the underlying math. This means we need to have a data frame with *only* the species counts, meaning that the sample labels need to be stored as the row names. This is at odds with the *tidyverse* principles, which would like to have any usable information as an actual variable in the data frame and row names are outlawed. Here, we use a convenience function from the *tibble* package to handle this issue for us:
+```{r}
+diat_df <- diat_wide |>
+  tibble::column_to_rownames("identifier")
+```
+
+Now that we have complete the data wrangling for the diatoms, we should sit back and take a small break and look at what we have created (well, a bit of it); do **not** type `diat_df` to print the entire thing
+
+```{r}
+diat_df[1:6, 1:6]
+```
+##### Chironomids
+
+Now we can repeate the steps for the chironomids. This is mostly the same as for the diatoms.
+
+```{r}
+#| label: load-chironomids
+chiros <- read_csv(
+  here("00-data/dataset55586_site26991.csv")
+) |>
+  select(!c(group, element, units, context))
+```
+
+```{r}
+#| label: chiros-to-long
+chiro_long <- chiros |>
+  pivot_longer(
+    cols = !name,
+    names_to = "identifier",
+    values_to = "value"
+  )
+```
+
+```{r}
+#| label: chiro-create-meta
+chiro_meta <- chiro_long |>
+  filter(
+    name %in% c(
+      "AnalysisUnitName", "Depth", "Thickness", "Sample Name", "Sample ID",
+      "Updated Carter et al. 2018"
+    )
+  ) |>
+  mutate(
+    name = replace_values(
+      name,
+      "Updated Carter et al. 2018" ~ "calibrated_age",
+      "Depth" ~ "depth_cm",
+      "Thickness" ~ "thickness_cm",
+    )
+  ) |>
+  pivot_wider(
+    id_cols = identifier,
+    names_from = name,
+    values_from = value
+  ) |>
+  janitor::clean_names()
+```
+
+```{r}
+#| label: chiro-clean-ages
+chiro_meta <- chiro_meta |>
+  select(
+    !c(analysis_unit_name, sample_name)
+  ) |>
+  mutate(
+    calibrated_age = str_replace(
+      calibrated_age, "^--/", ""
+    ),
+    calibrated_age = str_replace(
+      calibrated_age, "/--$", ""
+    ),
+    across(
+      c(depth_cm, thickness_cm, calibrated_age),
+      .fns = ~ as.numeric(.x)
+    )
+  ) |>
+  arrange(depth_cm)
+```
+
+```{r}
+chiro_long <- chiro_long |>
+  filter_out(
+    name %in% c(
+      "AnalysisUnitName", "Depth", "Thickness", "Sample Name", "Sample ID",
+      "Updated Carter et al. 2018"
+    )
+  )
+```
+
+```{r}
+chiro_wide <- chiro_long |>
+  mutate(
+    value = as.numeric(value),
+    value = replace_na(value, replace = 0)
+  ) |>
+  pivot_wider(
+    id_cols = identifier,
+    names_from = name,
+    values_from = value
+  ) |>
+  janitor::clean_names()
+```
+
+```{r}
+chiro_wide <- chiro_wide |>
+  left_join(
+    chiro_meta, by = "identifier"
+  ) |>
+  arrange(depth_cm) |>
+  select(identifier:zavrelimyia_type_a)
+```
+
+```{r}
+chiro_meta <- chiro_meta |>
+  left_join(
+    chiro_wide |> select(c(identifier, sample_quantity))
+  ) |>
+  rename(
+    sample_qty_ml = sample_quantity
+  )
+```
+
+```{r}
+chiro_wide <- chiro_wide |>
+  select(!sample_quantity)
+chiro_df <- chiro_wide |>
+  tibble::column_to_rownames("identifier")
+```
+
+##### Pollen
+
+The pollen data can also be loaded using alomst the same code. A couple of extra steps are needed however as the data are in a slightly different format and contain things we don't want.
+
+```{r}
+#| label: load-pollen
+pollen <- read_csv(
+  here("00-data/dataset47520_site26991.csv")
+) |>
+  filter(is.na(element) | element == "pollen") |> # only take the pollen
+  select(!c(group, element, units, context))
+```
+
+Note that here I have only taken those taxa counts that are considered "pollen". There are some taxa that occur twice (same name) but for different types. In Neotoma, the "type" is called an "elment". There are also some things that are not pollen; for your analysis you might want to choose more elements, for example aquatic pollen, spores, etc., so you may need a more complex filter for your own study.
+
+```{r}
+#| label: pollen-to-long
+pollen_long <- pollen |>
+  pivot_longer(
+    cols = !name,
+    names_to = "identifier",
+    values_to = "value"
+  )
+```
+
+```{r}
+#| label: pollen-create-meta
+pollen_meta <- pollen_long |>
+  filter(
+    name %in% c(
+      "AnalysisUnitName", "Depth", "Thickness", "Sample Name", "Sample ID",
+      "Updated Carter et al. 2018"
+    )
+  ) |>
+  mutate(
+    name = replace_values(
+      name,
+      "Updated Carter et al. 2018" ~ "calibrated_age",
+      "Depth" ~ "depth_cm",
+      "Thickness" ~ "thickness_cm",
+    )
+  ) |>
+  pivot_wider(
+    id_cols = identifier,
+    names_from = name,
+    values_from = value
+  ) |>
+  janitor::clean_names()
+```
+
+At this point we are handling the age model info, but this is provided with the lower and upper calibrated range, so we need to procees those data slightly differently. I could have used the code below to throw away the missing interval values for the diatoms and chironomids, but I forgot about the `str_split_i()` function until I got to the pollen and needed something different:
+```{r}
+#| label: pollen-clean-ages
+pollen_meta <- pollen_meta |>
+  select(
+    !c(analysis_unit_name, sample_name)
+  ) |>
+  mutate(
+    calibrated_age = str_split_i(
+      calibrated_age, "/", i = 2
+    ),
+    across(
+      c(depth_cm, thickness_cm, calibrated_age),
+      .fns = ~ as.numeric(.x)
+    )
+  ) |>
+  arrange(depth_cm)
+```
+
+```{r}
+pollen_long <- pollen_long |>
+  filter_out(
+    name %in% c(
+      "AnalysisUnitName", "Depth", "Thickness", "Sample Name", "Sample ID",
+      "Updated Carter et al. 2018", "Carter et al. 2018"
+    )
+  )
+```
+
+```{r}
+pollen_wide <- pollen_long |>
+  filter_out(name == "Lycopodium spike") |> # remove lycopodium
+  mutate(
+    value = as.numeric(value),
+    value = replace_na(value, replace = 0)
+  ) |>
+  pivot_wider(
+    id_cols = identifier,
+    names_from = name,
+    values_from = value
+  ) |>
+  janitor::clean_names()
+```
+
+```{r}
+pollen_wide <- pollen_wide |>
+  left_join(
+    pollen_meta, by = "identifier"
+  ) |>
+  arrange(depth_cm) |>
+  select(identifier:vitis)
+```
+
+```{r}
+pollen_df <- pollen_wide |>
+  tibble::column_to_rownames("identifier")
+```
+
+##### Data wrangling
+
+Which depths match between the diatoms and chironomids? We can answer that using a semi join:
+
+```{r}
+diat_meta |> semi_join(
+  chiro_meta,
+  by = join_by("depth_cm")
+)
+```
+
+Similarly we can do the same for the diatoms and pollen
+
+```{r}
+diat_meta |> semi_join(
+  pollen_meta,
+  by = join_by("depth_cm")
+)
+```
+
+where we note much greater overlap in the diatom and pollen data sets than in the diatom and chironomid data sets.
+
+## Unconstrained ordination
+
+### PCA
+
+In this section we will look at a some unconstrained ordination methods to explore patterns in the data. Typically, the interest will be on the *relative composition* of the taxa and how it changes over time. In that case, we can will tend to want to transform the data, for ordination, to percentages or proportions.
+
+To fit a PCA to the diatom data, we will usually have good success if we transform the data via the Hellinger transformation, which converts the data to proportions and then square root transforms them. Rather than having yet another copy of the data hanging around in a different format, and because the transformation is not computationally expensive, we can just perform the transformation on the fly by passing `diat_df` through the `decostand()` function, and thence to `pca()`
+
+```{r}
+diat_pca <- diat_df |>
+  decostand(method = "hellinger") |>
+  pca()
+```
+
+If we `print()` the PCA object, we get an overview of the ordination.
+
+```{r}
+diat_pca
+```
+We note that there are 35 axes (`Rank`), and the eigenvalues are shown for the first eight of these.
+
+To look at the proportions of the variance "explained" by each axis, we use the `eigenvals()` function:
+```{r}
+diat_pca |>
+  eigenvals() |>
+  summary()
+```
+Here we see that about 50% of the variance in the Hellinger-transformed data is retained by the first three axes of the PCA.
+
+We can plot the eigenvalues as a screeplot, with the broken stick null distribution superimposed using the `screeplot()` function
+```{r}
+diat_pca |>
+  screeplot(bstick = TRUE)
+```
+We note that the first three axes explain more variance than expected under the null model, but most of this is on the first PCA axis.
+
+Finally, we can plot the data
+```{r}
+scl <- "symmetric"
+diat_pca |> plot(scaling = scl)
+```
+Here I use the symmetric scaling option as a compromise for a single plot. As there are a large number of taxa here, the `plot()` method will choose to plot the data as points.
+
+To add information to the points, we can use the `ordisurf()` function to look at the temporal trend in the data
+```{r}
+diat_pca |> plot(scaling = scl)
+ordisurf(
+  diat_pca ~ calibrated_age,
+  data = diat_meta,
+  add = TRUE,
+  scaling = scl,
+  col = "forestgreen"
+)
+```
+
+### Correspondence analysis
+
+We can alternatively use a CA to explore these data. We convert to proportions, and then downweight rare taxa before piping the data to `ca()`:
+
+```{r}
+diat_ca <- diat_df |>
+  decostand(method = "total") |>
+  downweight() |>
+  ca()
+```
+
+```{r}
+diat_ca
+```
+We note that there are 35 axes (`Rank`), and the eigenvalues are shown for the first eight of these.
+
+To look at the proportions of the variance "explained" by each axis, we use the `eigenvals()` function:
+```{r}
+diat_ca |>
+  eigenvals() |>
+  summary()
+```
+Here we see that about 45% of the variance in the data is retained by the first three axes of the CA.
+
+We can plot the eigenvalues as a screeplot, with the broken stick null distribution superimposed using the `screeplot()` function
+```{r}
+diat_ca |>
+  screeplot(bstick = TRUE)
+```
+We note that the first four axes explain more variance than expected under the null model, but most of this is on the two CA axis. Note however that in CA the eigenvalues are constrained to be $< 1$, so the broken stick model is not quite an appropriate null model.
+
+Finally, we can plot the data
+```{r}
+scl <- "symmetric"
+diat_ca |> plot(scaling = scl)
+```
+Here I use the symmetric scaling option as a compromise for a single plot. As there are a large number of taxa here, the `plot()` method will choose to plot the data as points.
+
+To add information to the points, we can use the `ordisurf()` function to look at the temporal trend in the data
+```{r}
+diat_ca |> plot(scaling = scl)
+ordisurf(
+  diat_ca ~ calibrated_age,
+  data = diat_meta,
+  add = TRUE,
+  scaling = scl,
+  col = "forestgreen"
+)
+```
+
+We can zoom in on the points to make a better plot:
+
+```{r}
+diat_ca |> 
+  plot(scaling = scl, display = "sites", type = "p")
+ordisurf(
+  diat_ca ~ calibrated_age,
+  data = diat_meta,
+  add = TRUE,
+  scaling = scl,
+  display = "sites",
+  col = "forestgreen"
+)
+```
+
+I both analyses, we see, to greater or lesser extent, an arched or curved configuration of the smaples in the ordination. This is likely the result of there being a single dominant gradient (trend) in the diatom data, which for geometric reasons gets bent over multiple axes in the ordination.
+
+::: {.callout-tip}
+
+If you have time, repeat the PCA or the CA for the chironomid data.
+
+:::
+
+## Cocorrespondence analysis
+
+We'll compare the diatoms and pollen for the samples that overlap using cocorrespondence analysis (CoCA). To do a CoCA, we need to subset the data to the sample levels that match across the data. Here, I am sinply matching on the numeric depths of the samples being the same and I'm asusming these were done on the same core. An alternative would be match on sample ages, and also to allow some padding (a window) around the depths or ages.
+
+A semi-join is a *filtering* join;  it retains the samples from the `diat_meta` data that have a matching `depth_cm` in the `pollen_meta` data:
+
+```{r}
+diat_sub <- diat_meta |> semi_join(
+  pollen_meta,
+  by = join_by("depth_cm")
+)
+```
+
+Now that we have the metadata for the samples where we have both diatoms and pollen, we can use a semi-join on the diatom data themselves to filter only those with the retained smaple `identifier`s:
+
+```{r}
+diat_sub_df <- diat_wide |>
+  semi_join(
+    diat_sub,
+    by = join_by(identifier)
+  ) |>
+  tibble::column_to_rownames("identifier")
+```
+
+We repeat this step with the data sets reversed, to retain only those pollen samples with a matching diatom sample:
+
+```{r}
+pollen_sub <- pollen_meta |> semi_join(
+  diat_meta,
+  by = join_by("depth_cm")
+)
+```
+
+```{r}
+pollen_sub_df <- pollen_wide |>
+  semi_join(
+    pollen_sub,
+    by = join_by(identifier)
+  ) |>
+  tibble::column_to_rownames("identifier")
+```
+
+As a quick check, let's make sure that we have two objects with the same number of samples:
+```{r}
+all.equal(nrow(diat_sub_df), nrow(pollen_sub_df))
+```
+This is a minimum of checking that should be done on your data.
+
+Convert to proportions and run the Co-CA. Here we fit a symmetric Co-CA as we do not want one of the taxnomic groups to play the role of predictor and the other the response.
+
+```{r}
+dp_coca <- coca(
+  x = diat_sub_df |> decostand(method = "total"),
+  y = pollen_sub_df |> decostand(method = "total"),
+  method = "symmetric"
+)
+```
+
+We can look at how well we explain the covariance between the two taxonomic groups using the `summary()` method
+```{r}
+summary(dp_coca)
+```
+Here we note that we have sufficient axes to explain all of the covariance between the two data sets, so our task is to decide how many axes to display. We can look at the correlations between the axis scores for the diatoms and pollen
+
+```{r}
+corAxis(dp_coca)
+```
+
+We can also plot the eigenvalues of the Co-CA in a screeplot, to help decide how many to retain
+
+```{r}
+screeplot(dp_coca)
+```
+
+Here, we see a marked change in the slope of the screeplot at three Co-CA, indicating that two Co-CA axes describe the structure in the covariances of the diatom and pollen data.
+
+We should expect high correlations as that is what Co-CA is maximising, but we do see that the first two axes are the most strongly correlated. To produce plots of the samples on the first two CoCA axes, we can use
+```{r}
+layout(matrix(1:2, ncol = 2))
+plot(dp_coca, which = "y1", display = "sites")
+plot(dp_coca, which = "y2", display = "sites")
+layout(1)
+```
+
+A similar plot can be produced for the taxa, but we really need to abbreviate the taxon labels to achieve a better plot
+```{r}
+layout(matrix(1:2, ncol = 2))
+plot(dp_coca, which = "y1", display = "species", type = "t")
+plot(dp_coca, which = "y2", display = "species", type = "t")
+layout(1)
+```
+
+I should note that CoCA ordinations are difficult to plot cleanly, and you will need to exercise your R, *dplyr*, and possibly *ggplot2* skills. If you need help, email me or post in the [Discussions](https://github.com/gavinsimpson/cocorresp/discussions) tab of the GitHub repo for the *cocorresp* package.
+
+::: {.callout-tip}
+
+If you have time, repeat the Co-Ca code to look at the diatoms and chironomids.
+
+:::
+
+::: {.callout-note}
+
+You will need to repeat all the code from this section, as the chrionomids and diatoms overlap at fewer samples than the diatoms
+
+:::

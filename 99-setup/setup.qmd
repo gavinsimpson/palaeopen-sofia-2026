@@ -1,0 +1,58 @@
+---
+title: PalaeOpen Training School
+subtitle: Setup
+format:
+  revealjs:
+    theme: [simple, styles.scss]
+    embed-resources: true
+html-math-method:
+  method: mathjax
+  url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+author:
+  - name: Gavin Simpson
+    orcid: 0000-0002-9084-8413
+    email: gavin@anivet.au.dk
+    affiliations: Aarhus University
+date: last-modified
+title-slide-attributes:
+  data-background-color: "#003d73"
+presenter:
+  name: Gavin Simpson
+  institute: Department of Animal & Veterinary Sciences
+knitr:
+  opts_chunk: 
+    echo: false
+    message: false
+    fig.align: center
+    fig.height: 6
+    fig.width: 10.66666
+    collapse: true
+highlight-style: github-dark
+---
+
+## Create a folder
+
+Using your file manager
+
+* create a folder to store the teaching materials
+
+* ideally create it somewhere familiar
+
+* ideally no spaces in the folder name or path to it
+
+This folder will be added to each day
+
+## Install *usethis* 📦
+
+```{r}
+#| eval: false
+install.packages("usethis")
+```
+
+## Open RStudio
+
+* Start RStudio
+
+* Go to Session menu
+
+* Select **Select working directory** > **Choose Directory...**

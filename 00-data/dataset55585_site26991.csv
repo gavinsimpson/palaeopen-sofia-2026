@@ -1,0 +1,219 @@
+"name","group","element","units","context","S567723","S567734","S567743","S567749","S567755","S567728","S567738","S567748","S567725","S567732","S567741","S567751","S567726","S567735","S567747","S567729","S567733","S567744","S567754","S567721","S567731","S567740","S567752","S567720","S567730","S567737","S567746","S567722","S567742","S567753","S567724","S567736","S567745","S567727","S567739","S567750"
+AnalysisUnitName,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Depth,,,,,1490.25,1550.25,1610.25,1640.25,1698.25,1505.25,1560.25,1630.25,1525.25,1540.25,1590.25,1660.25,1520.25,1556.25,1627.25,1517.25,1546.25,1620.25,1690.25,1485.5,1536.25,1600.25,1670.25,1478.5,1530.25,1580.25,1625.25,1500.25,1565.25,1680.25,1495.25,1567.25,1623.25,1510.25,1570.25,1650.25
+Thickness,,,,,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,1,0.5,0.5,0.5,1,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5
+Sample Name,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Sample ID,,,,,567723,567734,567743,567749,567755,567728,567738,567748,567725,567732,567741,567751,567726,567735,567747,567729,567733,567744,567754,567721,567731,567740,567752,567720,567730,567737,567746,567722,567742,567753,567724,567736,567745,567727,567739,567750
+Updated Carter et al. 2018,Calibrated radiocarbon years BP,,,,--/207/--,--/3258/--,--/7010/--,--/8455/--,--/11426/--,--/827/--,--/3827/--,--/7980/--,--/1928/--,--/2686/--,--/5810/--,--/9763/--,--/1670/--,--/3604/--,--/7830/--,--/1506/--,--/3020/--,--/7496/--,--/11122/--,--/60/--,--/2475/--,--/6480/--,--/10422/--,--/-60/--,--/2176/--,--/5095/--,--/7732/--,--/578/--,--/4120/--,--/10829/--,--/379/--,--/4242/--,--/7633/--,--/1097/--,--/4423/--,--/9069/--
+Achnanthidium cf. A. minutissimum,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,1,,,,,,,,,,,,,,,,,,
+Achnanthidium linearioide,DIAT,valve,NISP,,,,,5,,,,,,,3,12,,,,,,7,,,,,,,,,,,,1,,,1,,,7
+Achnanthidium minutissimum s.l.,DIAT,valve,NISP,,,1,3,1,,,,,,,1,,,,1,,,1,,,,1,13,,,,,,,2,,,,,1,4
+Achnanthidium spp.,DIAT,valve,NISP,,,,,,,,,,,,1,,,,,,,,,,,,,,,,,,,1,,,,,,
+Adlafia bryophila,DIAT,valve,NISP,,,,,,,,,,,,,2,,,,,,,,,,,,,,,,,,,,,,,,
+Adlafia spp.,DIAT,valve,NISP,,,,,,,,,,,,,4,,,,,,,,,,,2,,,,,,,,,,,,,
+Aulacoseira aff. tenella,DIAT,valve,NISP,,,26,18,19,,6,33,18,13,17,11,,15,17,8,11,8,19,,4,11,3,,,18,4,6,,,,,,5,18,12,
+Aulacoseira alpigena,DIAT,valve,NISP,,38,75,30,30,155,9,68,70,35,64,187,30,38,112,43,33,44,50,46,42,89,90,65,2,53,97,35,22,31,87,2,34,31,79,77,18
+Aulacoseira ambigua,DIAT,valve,NISP,,,,,4,,,,5,,,,,,,,,,,,,,1,,,,,1,,,,,,5,,,
+Aulacoseira cf. A. valida,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,2
+Aulacoseira cf. alpigena,DIAT,valve,NISP,,,,,2,,,,,,,,,,,,,,3,,,,2,,,,,,,,,,,,,,4
+Aulacoseira lacustris,DIAT,valve,NISP,,7,,,,,18,,,,,,,,,,,,,,10,,,,,,,,4,,,5,,,9,,
+Aulacoseira laevissima,DIAT,valve,NISP,,5,6,4,1,,5,,3,15,6,4,2,,6,10,,11,6,,2,5,8,,,14,1,3,12,1,,,,2,35,,7
+Aulacoseira lirata,DIAT,valve,NISP,,,,115,,,,,30,,,4,,,,101,,,81,,2,,26,,4,,9,135,,,,,,152,,,
+Aulacoseira nivalis,DIAT,valve,NISP,,3,,,,,,,,,,3,,,,,,,,,,,,,,1,,,,,,,,,2,4,2
+Aulacoseira perglabra,DIAT,valve,NISP,,,10,,4,,,,,,7,,,,,,,,,,,,,,,3,4,,,4,,,4,4,,3,8
+Aulacoseira pfaffiana,DIAT,valve,NISP,,42,40,35,83,154,52,41,41,48,23,8,80,41,44,52,31,58,22,302,32,43,105,94,111,42,15,69,56,44,67,61,27,64,22,47,45
+Aulacoseira spp.,DIAT,valve,NISP,,4,2,2,5,,3,1,4,15,1,9,2,8,13,3,13,10,7,,9,11,9,4,,5,,2,8,3,,1,1,12,18,,27
+Aulacoseira valida,DIAT,valve,NISP,,,,4,6,,,,15,,,,8,,,8,,,6,2,,,12,3,,,,5,,,5,,,1,,,11
+Bacillaria paxillifer,DIAT,valve,NISP,,,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Brachysira brebissonii,DIAT,valve,NISP,,27,11,24,22,1,14,24,17,21,17,17,19,26,33,14,32,22,22,2,21,10,10,5,1,15,51,20,13,42,11,24,18,26,13,73,13
+Brachysira cf. neoexilis,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,2,,,,,,,,,,,,,,,,,,
+Brachysira cf. procera,DIAT,valve,NISP,,,,,,,,,,,,,,,,1,,,,,,,,,,,,,,,,,,,,,
+Brachysira procera,DIAT,valve,NISP,,,7,13,4,3,,1,7,1,3,8,7,,4,1,,2,2,,,,3,2,,,7,2,,7,,,2,1,,,3
+Brachysira serians,DIAT,valve,NISP,,,1,,,,,1,,,,,,,1,,,,,,,1,,,8,,,,,3,,,2,,,3,
+Brachysira spp.,DIAT,valve,NISP,,,1,,,,,,,,,,1,,,1,,,3,,,,,,,,,,,,,,1,,,,
+Caloneis alpestris,DIAT,valve,NISP,,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Caloneis bacillum,DIAT,valve,NISP,,,,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Caloneis spp.,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1
+Cavinula pseudoscutiformis,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,,7,,,,,,,2,,,,,,
+Chamaepinnularia mediocris,DIAT,valve,NISP,,15,36,2,3,,8,22,6,24,28,3,6,41,27,5,36,30,4,2,12,7,8,9,,25,9,2,16,36,4,3,3,4,26,2,1
+Chamaepinnularia muscicola,DIAT,valve,NISP,,,,,,,,,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,
+Chamaepinnularia rhombelliptica,DIAT,valve,NISP,,2,,,,,,1,3,1,1,,1,,2,2,,,,,,,1,,,,,3,,2,,,3,2,,2,
+Chamaepinnularia soehrensis,DIAT,valve,NISP,,1,,,,,,,,,,,,,,,,,,,1,,,,,,,,,,,1,,,,,
+Chamaepinnularia spp.,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,1,,,,,,,,1,,,,,,1,,,1
+Cocconeis spp.,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1
+Craticula minusculoides,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,,2,,,,,,,,,,,,,
+Craticula spp.,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,2,,,,,,,,,,,,,,,,,,
+Cymbopleura naviculiformis,DIAT,valve,NISP,,,1,,,,,,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,
+Diatoma mesodon,DIAT,valve,NISP,,,,1,1,,,,,,1,1,3,2,,1,,2,,,,1,,3,,2,,1,,2,3,,,,1,1,3
+Diatoma spp.,DIAT,valve,NISP,,,,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Encyonema elginense,DIAT,valve,NISP,,,,1,,,1,,,,,,1,,,,,,,1,,,,,,,,,,,3,,,,,,
+Encyonema gaeumannii,DIAT,valve,NISP,,3,6,3,6,16,,6,3,2,4,19,15,1,6,7,3,3,,19,1,4,6,38,,8,12,1,1,7,46,1,2,2,,4,5
+Encyonema hebridicum,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,1,,,,,,,,,,,,,,,,
+Encyonema neogracile,DIAT,valve,NISP,,,1,4,,,,,3,,1,1,5,,,6,,,,6,,,,8,,,2,1,,1,4,,,4,,,6
+Encyonema perpusillum,DIAT,valve,NISP,,1,,,,,,1,,,,,,,,,,,,,,1,,,,,,,,1,,1,,,1,,
+Encyonema silesiacum,DIAT,valve,NISP,,1,,,,,,,,,,,,,,,,,,,2,,,,,1,,,,,,,,,,,2
+Encyonema spp.,DIAT,valve,NISP,,6,1,5,7,8,2,4,5,,1,9,7,1,1,1,2,1,9,1,4,2,6,5,,,5,2,2,1,3,3,1,,4,1,
+Encyonopsis cesatii,DIAT,valve,NISP,,9,1,,,,1,,,1,1,,,,1,,1,,,,9,2,,,,,1,,5,,,1,1,,,,
+Encyonopsis spp.,DIAT,valve,NISP,,,,,,,,,,,,1,,,,,,,,,,,,,,,,,,,,,1,,,1,
+Eunotia aff. faba,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,,,,,,,
+Eunotia aff. flexuosa,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,1,1,,,,,,,,,,,,,,,,,
+Eunotia ambivalens,DIAT,valve,NISP,,,,,,,,,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,
+Eunotia bilunaris,DIAT,valve,NISP,,1,,1,,,1,2,,2,1,,,2,3,,,4,,,,,,,9,1,,,4,5,,4,,,,2,
+Eunotia boreoalpina,DIAT,valve,NISP,,,,2,6,3,,,9,,,5,3,,,9,,,2,2,2,,1,2,,,,6,,,2,,,6,,,1
+Eunotia cf. E. dorofeyukiae,DIAT,valve,NISP,,,,,1,,,,,,,,,,,1,,,,,,,,,,,,,,,,,,,,,1
+Eunotia cf. minor,DIAT,valve,NISP,,,,,,,,,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Eunotia cf. sudetica,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,,2,,,,,,,,,,,,,
+Eunotia diadema,DIAT,valve,NISP,,,,,,,,2,,1,,1,,,,,,2,,,,1,2,1,,,,,,2,,,,,,,
+Eunotia dorofeyukiae,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,2,,,,,,,,,,,,,,,,,
+Eunotia exigua s.l.,DIAT,valve,NISP,,22,22,9,2,,25,15,11,16,32,4,7,16,12,9,26,23,4,1,21,22,2,2,116,17,12,2,37,13,1,25,4,7,15,5,11
+Eunotia faba,DIAT,valve,NISP,,,,,,,,,,1,,,,,1,,,,,,,,,,,,,,,,,,,,,1,
+Eunotia flexuosa,DIAT,valve,NISP,,,1,1,,1,2,,,,1,,,1,,,,2,,,,1,,,,,1,,,2,,,,,2,1,
+Eunotia hexaglyphis,DIAT,valve,NISP,,,,,,,,,,,,,,,,,3,,,,,,,,,,,,,,,,,,3,,
+Eunotia iatriaensis,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,1,,,,,,,,,,,,,,,,
+Eunotia incisa,DIAT,valve,NISP,,15,20,9,9,,25,36,2,42,24,10,10,16,12,4,24,31,10,1,16,30,9,2,40,30,12,3,35,56,4,21,17,4,16,23,4
+Eunotia incisadistans,DIAT,valve,NISP,,,,,1,,,,4,,,,,,,,,,,,,,,,,,1,,,,,,,2,,,9
+Eunotia islandica,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,1,,,,,,,,,,,,,,,,
+Eunotia marvanii,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,,,
+Eunotia microcephala,DIAT,valve,NISP,,1,5,,,,,3,,2,3,,,4,3,,1,1,,,,1,2,,,3,,,1,4,,1,,,3,3,
+Eunotia minor,DIAT,valve,NISP,,1,,1,,1,1,,2,1,,1,1,,,2,,,,1,,2,1,3,1,,,5,1,2,5,,,,,5,6
+Eunotia minutula,DIAT,valve,NISP,,,,,,,,,,,1,,,,,,,,,,1,,,,,,,,,,,,,,,,
+Eunotia mucophila,DIAT,valve,NISP,,,3,,,,,2,,,3,,,,,,,,,,,,,,,,,,,,,1,,,,,
+Eunotia nymanniana,DIAT,valve,NISP,,,1,,,,,2,,,,1,1,,,,1,,,,,,1,2,,1,,,,1,1,,,,,,3
+Eunotia paludosa,DIAT,valve,NISP,,2,7,1,,,2,6,,2,,1,,,,,3,3,2,,,,4,1,1,2,8,,,1,,,6,,,6,
+Eunotia paratridentula,DIAT,valve,NISP,,,,3,,,,1,,,,,,,,,1,1,2,,,,,,,2,,,,,,,,1,,2,
+Eunotia praerupta,DIAT,valve,NISP,,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Eunotia rhomboidea,DIAT,valve,NISP,,9,10,2,2,4,22,9,3,14,10,1,1,10,10,6,9,9,3,1,12,23,,2,11,12,3,3,19,12,,15,6,4,6,6,5
+Eunotia seminulum,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,1,,,,,,,,1,,,,,,5,,
+Eunotia serra s.l.,DIAT,valve,NISP,,,,2,,,2,,,1,,,,3,,,1,,1,,,2,,,,,,,,,,2,,,3,,
+Eunotia soleirolii,DIAT,valve,NISP,,,,,,,,,2,,,,,,,,,,,,,,,,,,,,,,,,,2,,,
+Eunotia spp.,DIAT,valve,NISP,,1,3,2,3,1,16,7,6,7,8,6,3,12,7,1,4,8,7,1,4,5,4,2,20,17,6,3,13,18,2,11,1,2,15,8,3
+Eunotia subarcuatoides,DIAT,valve,NISP,,1,,,,,,,,,,,,,,,,,1,,,,,,,,,1,,,,,,,,,
+Eunotia trinacria,DIAT,valve,NISP,,,1,,1,,1,1,,1,3,,2,3,,1,1,4,,,,,,,,4,3,1,2,2,,,1,,,,1
+Eunotia valida,DIAT,valve,NISP,,,,1,,,,,,,,,,,,2,,,,,,,,,,,,,,,,,,,,,
+Fallacia spp.,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,,1,,,,,,,,,,,,,
+Fragilaria capucina sensu lato,DIAT,valve,NISP,,,,,,,,,,,,,,,,1,,,,,,,,1,,,3,,,,1,,,,,,
+Fragilaria hungarica var. tumida,DIAT,valve,NISP,,20,4,,,,31,,,33,48,,,33,2,,58,26,,,22,32,,,,15,,,12,,,53,,,19,,
+Fragilaria nevadensis,DIAT,valve,NISP,,,1,4,1,2,,,,,1,,11,1,1,,,1,,,3,,,2,,1,,,1,1,2,,,1,,,4
+Fragilaria spp.,DIAT,valve,NISP,,3,,,5,2,1,1,7,,6,3,8,,1,,,,6,,,,16,,,1,,,,2,,1,,,,1,8
+Fragilariforma aff. nitzschioides,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,4,,,,,,,,,,,,,,
+Fragilariforma cf. virescens,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,2
+Fragilariforma constricta,DIAT,valve,NISP,,1,,,,,1,,1,,,,,3,,1,2,,,,,1,,,,,1,,,,,,,,1,,
+Fragilariforma polygonata,DIAT,valve,NISP,,1,,,,,3,,,,,,,3,,,,3,,,2,,,,,,,,1,,,1,,,,,
+Fragilariforma virescens,DIAT,valve,NISP,,1,2,,1,3,3,1,1,,1,,3,3,,7,1,1,,2,,1,2,1,1,3,,2,1,,6,1,,2,2,,4
+Frustulia cf. erifuga,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,,,
+Frustulia cf. krammeri,DIAT,valve,NISP,,,,,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,1
+Frustulia crassinervia,DIAT,valve,NISP,,2,,6,8,,,,8,,,3,4,,,4,,,3,,,,,,,,,1,,,,,,1,,15,
+Frustulia erifuga,DIAT,valve,NISP,,,,,,,,,1,,,,,,,,,,,,,,,,,,,1,,,,,,,,,
+Frustulia krammeri,DIAT,valve,NISP,,15,8,2,7,16,9,14,3,11,11,8,19,10,21,8,6,10,3,4,32,23,4,11,2,12,16,8,12,16,23,24,6,10,8,8,3
+Frustulia saxonica,DIAT,valve,NISP,,17,10,,,,15,12,,11,5,,3,13,7,,15,5,,1,32,16,,2,9,12,14,,13,5,3,18,4,,11,5,
+Frustulia spp.,DIAT,valve,NISP,,,,2,,,,,2,,,3,1,,,,,,7,,,,8,,,,,,,,,,,,,3,5
+Geissleria spp.,DIAT,valve,NISP,,,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Genkalia boreoalpina,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,,,
+Genkalia digitulus,DIAT,valve,NISP,,,,,,,,,,,,,,,,2,,,,,,,,,,,,,,,,,,,,,
+Genkalia spp.,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1
+Gomphonema coronatum,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,1,,,,,,,,,,,,,,,,,,
+Gomphonema exilissimum,DIAT,valve,NISP,,,,,,,,,,2,,,,,2,,,,,,,,,,,,,,,,,,,,,,
+Gomphonema gracile,DIAT,valve,NISP,,,1,,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Gomphonema parvulum s.l.,DIAT,valve,NISP,,,,,3,,,,,,,,1,,,1,,,1,,,,,,,,,1,,1,1,,,,,,2
+Gomphonema productum,DIAT,valve,NISP,,,,,,,,,,,,,,,,1,,,3,,,,,,,,,2,,,,,,,,,
+Gomphonema pseudoaugur,DIAT,valve,NISP,,,1,,,,,,,,,,,,,,,,,,,,,1,,,,,,,,,,,,,
+Gomphonema spp.,DIAT,valve,NISP,,,,4,6,,,2,3,,2,3,3,,1,1,,2,9,,1,2,2,2,,,,1,1,2,3,1,3,1,,,8
+Gomphonema subclavatum,DIAT,valve,NISP,,,,,,,,,1,,,,,,,,,,,,,,,,,,,,,1,,,,,,,
+Hantzschia amphioxys,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,1,,,,1,1,,,,,,,,,,,,1
+Humidophila brekkaensis,DIAT,valve,NISP,,,,,,,,1,,,,,,,,,,,,,,,,,,,,,,1,,,,,,,
+Humidophila contenta,DIAT,valve,NISP,,,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,,1,,,1,,
+Humidophila perpusilla,DIAT,valve,NISP,,,,,,,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,,,
+Humidophila spp.,DIAT,valve,NISP,,,,2,2,,,,,,,,,,,,,,,,,,1,,,,,,,,,,,1,,,
+Iconella curvula,DIAT,valve,NISP,,,1,,,,,1,,1,1,,,1,,,1,,,,1,,,1,3,,2,,1,2,,,1,,1,,
+Iconella delicatissima,DIAT,valve,NISP,,,,,,,,,,,1,,,1,,,,,,,,,,,2,,,,,,,1,,,,,
+Kobayasiella cf. subtilissima,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,
+Kobayasiella parasubtilissima,DIAT,valve,NISP,,,,,,,,2,,,,,,1,2,,,2,,,,,,,,,1,,,1,,,,,,,
+Kobayasiella spp.,DIAT,valve,NISP,,2,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,,,2,,,4,
+Kobayasiella subtilissima,DIAT,valve,NISP,,9,1,,,,,1,,,,,,1,,,,1,,,1,,,,8,1,1,,1,2,,,1,,,,
+Luticola spp.,DIAT,valve,NISP,,,,,,,,,,1,,,,,,,,,,,1,,,,,,,,,,,1,,,,,
+Mayamaea agrestis,DIAT,valve,NISP,,,,,,,,,,,2,,,,,,1,,,,,,,,,1,,,,,,,,,1,,
+Meridion circulare,DIAT,valve,NISP,,,,,1,,,,1,,,,,,,,,,1,,,,,,,,,,,,,,,,,,
+Meridion constrictum,DIAT,valve,NISP,,,,,,,,,,,,,1,,,,,,1,,,,,1,,,,,,,1,,,,,,
+Navicula angusta,DIAT,valve,NISP,,,,3,8,8,,,5,,,,3,,,7,,1,,14,,,1,5,1,,,1,,,7,,,2,,,
+Navicula cf. angusta,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1
+Navicula cryptocephala,DIAT,valve,NISP,,,,,7,,,,,,,,,,,1,,,,,,,,,,,,2,,,,,1,,,,6
+Navicula heimansioides,DIAT,valve,NISP,,3,7,17,31,1,1,4,15,,1,14,22,,1,15,2,2,9,2,5,,7,21,,,20,12,3,4,13,4,1,12,,2,7
+Navicula spp.,DIAT,valve,NISP,,,,,1,,,1,,,,1,2,,,1,,,12,,,1,,,,,,1,,,,,,2,,2,
+Naviculaceae,DIAT,valve,NISP,,5,,4,16,1,6,,5,2,,9,3,1,,1,7,,9,,3,1,4,4,3,,7,4,2,1,4,7,1,3,1,8,15
+Neidium affine,DIAT,valve,NISP,,,1,,,,1,2,,2,,,1,2,1,,2,2,,,3,3,,1,,1,1,,3,4,3,2,,,,1,
+Neidium alpinum,DIAT,valve,NISP,,1,,,,,1,1,,,,,,1,2,,1,,,,1,,,,,3,,,,,,,,,3,,1
+Neidium ampliatum,DIAT,valve,NISP,,3,,,,,,,,,,,,,,1,,,,,,1,,,4,,,,,,,,,1,,,
+Neidium bisulcatum,DIAT,valve,NISP,,,,,2,,,,,,,,,1,,3,,1,,3,,,,1,,,,,,,5,2,,1,,,
+Neidium cf. N. ampliatum,DIAT,valve,NISP,,,1,,,,1,1,,5,,,,,1,,3,,,,3,,,,,1,,,1,1,,1,,,,,
+Neidium longiceps,DIAT,valve,NISP,,,1,,,,,,,,,1,,,,,,,,,3,,,,,,,,,,,,,1,,,
+Neidium spp.,DIAT,valve,NISP,,3,2,2,4,,3,,5,1,3,2,2,,1,3,2,3,1,3,3,2,,3,1,4,8,5,,1,1,5,1,5,3,5,1
+Nitzschia cf. vermicularis,DIAT,valve,NISP,,,,1,1,,,,1,,,,1,,,1,,,,,,,1,1,,,,1,,,1,,,1,,,
+Nitzschia gracilis,DIAT,valve,NISP,,4,3,,,,,,,,,,,1,,,,,,,,,,,,1,,,3,,,,,,,,
+Nitzschia perminuta,DIAT,valve,NISP,,,,4,4,,1,6,,,8,1,1,2,1,1,4,4,2,2,,6,2,4,,,2,1,6,,5,4,,1,4,3,3
+Nitzschia spp.,DIAT,valve,NISP,,,1,,1,,1,,,,1,,,1,2,1,1,1,,1,1,,,1,,1,,,,1,1,,,1,1,,
+Nupela fennica,DIAT,valve,NISP,,,,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Nupela gracillima,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,,,,,,2,,,,,,,,,
+Nupela impexiformis,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,2
+Nupela lapidosa,DIAT,valve,NISP,,,,1,,2,,,,,,,,,,,,,1,,,,2,,,,,,,,,,,,,,1
+Nupela spp.,DIAT,valve,NISP,,,,,,,,,,,,1,,,,1,,,,,,,,,,,,,,,,,,,,,
+Nupela subrostrata,DIAT,valve,NISP,,,,,,,,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,,
+Nupela tenuicephala,DIAT,valve,NISP,,3,1,,,,,3,,8,5,,,17,2,,2,,,,,1,,,,1,2,,1,8,,1,3,,3,6,
+Nupela vitiosa,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,,2,,,,,,,,,,,,,1
+Peronia fibula,DIAT,valve,NISP,,10,4,,6,,6,2,2,11,7,,4,5,4,1,4,2,3,,5,3,,,,3,14,1,4,5,,6,1,3,4,3,3
+Pinnularia anglica,DIAT,valve,NISP,,7,,2,4,3,14,,,1,1,2,,,2,3,,,,,5,7,,1,6,1,,1,6,,8,8,,9,7,1,7
+Pinnularia angulosa,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1
+Pinnularia appendiculata,DIAT,valve,NISP,,,,,,,,,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,
+Pinnularia biceps,DIAT,valve,NISP,,,4,,,,,4,,2,,,3,,,,,2,,,1,1,,,,1,,,1,4,,,1,,1,,
+Pinnularia brauniana,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,1,,,,,,,,,,,,,,,,,2
+Pinnularia cf. P. biceps,DIAT,valve,NISP,,,,,,,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,,1,
+Pinnularia cf. P. silvatica,DIAT,valve,NISP,,,,1,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Pinnularia divergens f. divergens,DIAT,valve,NISP,,,,,,,,,,,,,10,,,,,,,,,,,,,,,,,,,,,,,,
+Pinnularia divergens s.l.,DIAT,valve,NISP,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,1,,,,,,,,
+Pinnularia dornii,DIAT,valve,NISP,,,,,1,,,,,,,,,,,1,,,,,,,,,,,,,,,,,,,,,
+Pinnularia interrupta var. gibberula,DIAT,valve,NISP,,,,,,,,,,,,,,4,,,,,,,,,,,,5,,,,,,,,,,,
+Pinnularia kuetzingii,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,,,1,,,,,,,,,,,,
+Pinnularia perirrorata,DIAT,valve,NISP,,,,,,,,,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,
+Pinnularia pisciculus,DIAT,valve,NISP,,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Pinnularia polyonca,DIAT,valve,NISP,,,,,,,,,,,,,1,,,2,,,,,,,,,,,,,,,,,,,,,
+Pinnularia rhombarea,DIAT,valve,NISP,,,,,,,,,4,1,,,,2,1,,1,,,,,2,,,2,,,,,,,,,,,,
+Pinnularia rupestris,DIAT,valve,NISP,,,,,,,,,,1,,,,,,,2,1,,,1,4,,,2,1,,,,,,,,,,,
+Pinnularia silvatica,DIAT,valve,NISP,,,1,,,,3,,2,1,5,,,1,,,1,6,1,,,1,1,,1,2,,,2,,,2,1,,1,,3
+Pinnularia spp.,DIAT,valve,NISP,,8,2,8,12,1,10,8,13,5,5,10,4,3,5,6,6,3,7,2,6,3,10,4,5,1,9,10,2,4,4,5,2,7,3,11,6
+Pinnularia stomatophora f. stomatophora,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,2,,,,,,
+Pinnularia stomatophora var. irregularis,DIAT,valve,NISP,,,,,,,,,,,,1,,,,2,,,,,,,,,,,,,,,,,,,,,
+Pinnularia subanglica,DIAT,valve,NISP,,,,,,7,,,3,,,,,,,2,,,,29,,,,2,,,,1,,,17,,,2,,,
+Pinnularia subcapitata s.l.,DIAT,valve,NISP,,6,4,7,11,7,12,10,,22,11,3,7,24,9,,15,22,5,,11,16,,3,14,23,1,,25,3,5,14,3,,10,4,7
+Pinnularia subcapitata var. subrostrata,DIAT,valve,NISP,,,3,,2,,4,,12,2,,,,3,,6,1,,,1,,,3,1,,,2,4,,,,,,3,,,2
+Pinnularia subgibba,DIAT,valve,NISP,,,2,1,,1,4,1,,1,,3,,5,1,,2,3,,,2,3,,1,1,1,,2,3,,7,3,,,,3,
+Pinnularia subrupestris,DIAT,valve,NISP,,,1,,,,,,,,,,,,1,,,,,,,,,,,,,,,,4,,,,,,
+Pinnularia viridiformis,DIAT,valve,NISP,,,,,,,,,,,,,,,,,2,,,,,,,,,,,,,,,,,,,,
+Planothidium lanceolatum,DIAT,valve,NISP,,,,,,3,,,,,,,3,,,,,,,,,,,2,,,,,,,1,,,,,,3
+Planothidium spp.,DIAT,valve,NISP,,,,,3,1,,,,,,,,,,,,,2,,,,2,,,,,1,,,3,,,,,1,2
+Platessa oblongella,DIAT,valve,NISP,,5,7,9,2,,9,12,3,1,10,3,2,1,2,,2,4,3,1,13,2,,1,,4,4,,2,12,1,4,3,,5,4,12
+Psammothidium acidoclinatum,DIAT,valve,NISP,,,,,2,,,,,,,,1,,,,,,,3,4,,,9,1,,,,,,,1,,,,,4
+Psammothidium altaicum,DIAT,valve,NISP,,2,,,2,,,,2,1,1,,2,,,,1,,4,1,1,,3,,,1,1,2,1,,,3,,1,2,,6
+Psammothidium helveticum,DIAT,valve,NISP,,41,6,7,2,,14,4,,1,3,,4,10,2,2,12,6,1,,18,3,2,4,3,10,16,,18,1,,6,1,2,15,2,6
+Psammothidium microscopicum,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,1,,,,,,,,,,,,,,
+Psammothidium perpusillum,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,,,,,,,2,,,,,,,,,,
+Psammothidium spp.,DIAT,valve,NISP,,,,,1,,,,1,,,,3,,,1,,,,,,,3,3,7,,,1,,,,,,,,,4
+Psammothidium subatomoides,DIAT,valve,NISP,,,,,,,,,,,,,3,,,,,,,,2,,,,,,,,,,,,,,,,3
+Rossithidium nodosum,DIAT,valve,NISP,,,,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Sellaphora atomoides,DIAT,valve,NISP,,1,,,,,1,1,,,1,,,,,,,1,,1,,,,1,,,,,,,,,,,,1,1
+Sellaphora raederae,DIAT,valve,NISP,,,18,4,3,,3,15,6,6,9,1,16,15,3,4,6,7,6,,,,3,8,,16,,2,2,8,,4,4,4,6,,9
+Sellaphora spp.,DIAT,valve,NISP,,1,,,1,,,,,,,2,,,,,,,2,,,,2,,,,,2,,,,,,,,,2
+Sellaphora verecundiae,DIAT,valve,NISP,,,1,4,2,,,,2,,,2,3,,,2,,,,,,,5,1,,,,2,,,,,,2,,,1
+Stauroforma exiguiformis,DIAT,valve,NISP,,,6,3,6,1,,,5,,1,2,1,,,3,,,3,7,,,1,1,,,,5,,,15,,,12,,,2
+Stauroneis acidoclinata,DIAT,valve,NISP,,,,,,,,,,,,,,1,1,,,,,,,,,,,,,,,,,,,,,,
+Stauroneis angustilancea,DIAT,valve,NISP,,,,,,,,,,,1,,3,1,,,,1,,,,,,,,,,,,,,1,,,,,
+Stauroneis gracilis,DIAT,valve,NISP,,,,,1,2,,,,,,,,,,,,,2,1,,,,,,,,,,,,,,,,,
+Stauroneis neohyalina,DIAT,valve,NISP,,,,,,6,,,,,,,,,,1,,,,9,,,,4,,,,2,,,3,,,1,,,
+Stauroneis spp.,DIAT,valve,NISP,,2,,,4,,,1,2,,,,1,,,1,1,1,,5,2,,5,,,,1,,1,1,1,,,1,1,1,
+Staurosira venter,DIAT,valve,NISP,,,,1,6,1,,,10,,,,,,,5,,,,3,,,2,10,,,,4,,,9,,,3,,,17
+Surirella linearis,DIAT,valve,NISP,,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Surirella spp.,DIAT,valve,NISP,,,,,,,,,1,,,1,1,,1,,,,,,1,,,1,,,1,,,,1,1,,1,1,,1
+Tabellaria cf. T. flocculosa,DIAT,valve,NISP,,5,5,3,2,2,18,5,,4,1,,6,1,10,1,3,7,,1,4,8,2,1,4,1,8,,30,5,1,18,1,2,,4,
+Tabellaria fenestrata,DIAT,valve,NISP,,,,,,2,,,,,,,,,,,,,,4,,,,,1,,,,,,2,,,,,,
+Tabellaria spp.,DIAT,valve,NISP,,,,,2,,,,2,,,2,,,,,,,1,1,,,,,,,,,,,,,,,,2,3
+Tabellaria ventricosa,DIAT,valve,NISP,,,,,,,,,,,,,,,,,,,,,1,,,,1,,,,,,,,,,,,
+Undetermined diatom,DIAT,valve,NISP,,,,,,,,,3,,,,,,,,,,2,,,,1,,,,,,,,,,,1,,,2
+aff. Nupela,DIAT,valve,NISP,,7,,,,,1,,,4,,,,,1,,7,,,,2,2,,,,,,,4,,,2,,,2,,
