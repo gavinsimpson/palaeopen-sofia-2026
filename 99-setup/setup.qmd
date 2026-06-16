@@ -45,6 +45,7 @@ This folder will be added to each day
 ## Install *usethis* 📦
 
 ```{r}
+#| label: install-usethis
 #| eval: false
 install.packages("usethis")
 ```
@@ -56,3 +57,26 @@ install.packages("usethis")
 * Go to Session menu
 
 * Select **Select working directory** > **Choose Directory...**
+
+* Use the file browser to navigate to the folder you created earlier
+
+* Make sure you are in that folder, then select Open
+
+## Download materials
+
+Run the code below to download the materials
+
+```{r}
+#| label: usethis-use-course
+#| eval: false
+usethis::use_course(
+  "gavinsimpson/palaeopen-sofia-2026",
+  destdir = "./"
+)
+```
+
+Answer the questions; it is OK to delete the downloaded Zip when asked.
+
+## RStudio restarts
+
+Once everything is completed, **usethis** will automatically restart RStudio in the folder containing the downloaded materials
