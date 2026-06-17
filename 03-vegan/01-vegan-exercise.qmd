@@ -106,7 +106,15 @@ Begin by loading the data:
 ```{r}
 swap138 <- vegan::read.cep(here("00-data/swap138.cep"))
 swap138 <- chooseTaxa(swap138, max.abun = 2)
+```
 
+If reading this file fails, you can read the data from the `swapdiat.csv` file in `00-date` using
+```{r}
+swap138 <- readr::read_csv(here("00-data/swapdiat.csv"))
+swap138 <- chooseTaxa(swap138 |> as.data.frame(), max.abun = 2)
+```
+Now we load the water chemistry data:
+```{r}
 swapenv <- cepreader::readCEP(here("00-data/swap138.log"))
 ```
 
