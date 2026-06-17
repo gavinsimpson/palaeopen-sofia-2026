@@ -50,3 +50,6 @@ rsconnect/
 
 # Apple crap
 .DS_Store
+
+# saved R objects
+04-fancy-stuff/models/*.rds
