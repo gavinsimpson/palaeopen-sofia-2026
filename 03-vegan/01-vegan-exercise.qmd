@@ -110,6 +110,12 @@ swap138 <- chooseTaxa(swap138, max.abun = 2)
 swapenv <- cepreader::readCEP(here("00-data/swap138.log"))
 ```
 
+If the last command fails, we can read in the data using `readr::read_csv()`. Asusmign you put the downloaded CSV file in the `00-data` folder, we can read the data as follows:
+
+```{r}
+swapenv <- readr::read_csv(here("00-data/swapenv.csv"))
+```
+
 Now fit the CCA with selected chemistry variables
 
 ```{r}
