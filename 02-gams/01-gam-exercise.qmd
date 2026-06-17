@@ -1,0 +1,201 @@
+---
+title: "PalaeoOpen GAM exercise 1"
+author: "Gavin L. Simpson"
+format:
+  html:
+    toc: true
+    html-math-method: katex
+    embed-resources: true
+    monobackgroundcolor: white
+    code-line-numbers: false
+knitr:
+  opts_chunk: 
+    echo: true
+    fig.align: center
+    collapse: true
+highlight-style: github
+---
+
+## Generalized additive models
+
+In this exercise you'll fit GAMs to model the response of a diatom taxon to lake water pH, using data from the Surface Waters Acidification Project (SWAP) diatoma training set.
+
+### Load required packages
+
+```{r}
+pkgs <- c(
+  "here", "mgcv", "readr", "gratia", "tidyr", "dplyr"
+)
+
+vapply(
+  pkgs, library, logical(1),
+  character.only = TRUE, logical.return = TRUE
+)
+```
+
+### Load data
+
+#### Water chemistry
+
+The SWAP water chemistry data are relatively simple and therefore easy to load into R from the CSV file
+
+```{r}
+#| label: load-swap-chem
+swapc <- read_csv(here("00-data/swap-chemistry.csv"))
+```
+
+Whereas, the diatom data are available in long format from the European Diatom Data Initiative (EDDI) project, and require some wrangling.
+
+We begin by loading the data from the CSV file, cleaning the column names, retaining only the three needed columns, and finally renaming a long variable name:
+
+```{r}
+## code for swap diatoms
+swapd <- read_csv2(here("00-data/swap-diatom-counts.csv")) |>
+  janitor::clean_names() |>
+  select(
+    c(original_diatom_sample_id, taxon_id, abun)
+  ) |>
+  rename(
+    sample_id = original_diatom_sample_id
+  )
+```
+
+Next, we reshape the diatom data from long to wide format, and replace the `NA` values with 0s:
+```{r}
+swapd <- swapd |>
+  pivot_wider(
+    id_cols = "sample_id",
+    names_from = "taxon_id",
+    values_from = "abun"
+  ) |>
+  mutate(
+    across(
+      AC013A:NA057A,
+      .fns = ~ replace_na(.x, replace = 0)
+    )
+  )
+```
+The `NA`s indicate that the taxon was not observed among the valves counted in a respective sample. As such, it is appropriate to replace these `NA`s with `0`s, especially as we will model the data using a binomial count GAM later.
+
+To facilitiate fitting the binomial count model, we need to know the total number of valves counted per sample. This would usually be a simple `rowsums()` operation, but in the *tidyverse* this requires the use of `rowwise()`:
+```{r}
+swapd <- swapd |>
+  rowwise() |>
+  mutate(
+    total_count = sum(c_across(AC013A:NA057A))
+  )
+```
+
+## Fitting a GAM
+
+To fit a GAM, we need to have both water chemistry and diatom data in a single object. To keep things simpler here, we will take a few diatom taxa and join them to selected water chemistry variables, matching on the `sample_id` column:
+
+```{r}
+swap_sub <- swapd |>
+  select(
+    c("sample_id", "AC013A", "BR006A", "FR005D", "total_count")
+  ) |>
+  left_join(
+    swapc |> select(c("sample_id", "pH", "Altot", "DOC", "Alkal")),
+    by = join_by("sample_id")
+  )
+```
+
+The three selected taxa are an *Achnanthese* (*minutissima* IIRC), a *Brachysira*, and a *Frustulia* (*rhomboides* var. *saxonica*, again IIRC --- it's been a while)
+
+We'll begin by fitting a GAM to model the probability of occurence of `FR005D` as a smooth function of lake water pH
+
+```{r}
+m_ph <- gam(
+  cbind(FR005D, total_count - FR005D) ~ s(pH, k = 6),
+  data = swap_sub,
+  family = binomial(),
+  method = "REML"
+)
+```
+
+The response here is supplied as a two-column matrix, where the first column is the number of *successes*, i.e. the counts of `FR005D` valves in each sample, and the number of *failures*, i.e. the number of times we counted a valve that wasn't `FR005D` in each sample.
+
+We keep `k`, the number of basis functions, relatively low; we don't expect very complex relationships with pH.
+
+The model summary provides an assessment of the estimated model;
+```{r}
+m_ph |> summary()
+```
+The test for the smooth function is against a null hypothesis of a flat, constant function. Here we see that the estimated effect is very inconsistent with this null hypothesis. However, this test is contingent upon the data conditonal upon the estimated effects meeting the assumptions of the model.
+
+If we plot the fitted values (on the linear predictor) against the randomised quantile residuals, we see significant departure from roughly even variation about the zero line.
+
+```{r}
+m_ph |> residuals_linpred_plot(type = "quantile")
+```
+Yikes! That looks bad!
+
+The increasing spread of the residuals suggests the data are overdispersed relative to what the binomial model expect. By refitting with `family = quasibinomial()` we can estimate the degree of overdisperson
+
+```{r}
+m_ph2 <- m_ph |> update(
+  family = quasibinomial()
+)
+```
+We examine the estimated scale parameter, which in the binomial is supposed to be equal to 1:
+```{r}
+m_ph2 |> dispersion()
+```
+This suggests that the data are very much overdispersed; this is likely due to other variables affecting the abundance of this taxon, plus other unmeasured effects.
+
+To account for the overdispersion, we will fit an observational-level random effct. This requires that we convert the `sample_id` vector to a factor:
+
+```{r}
+swap_sub <- swap_sub |>
+  mutate(f_sample_id = factor(sample_id))
+```
+
+The we refit our model
+```{r}
+m_ph3 <- gam(
+  cbind(FR005D, total_count - FR005D) ~ s(pH, k = 6) +
+    s(f_sample_id, bs = "re"),
+  data = swap_sub,
+  family = binomial(),
+  method = "REML"
+)
+```
+and look again at the radomised quantile residuals:
+```{r}
+m_ph3 |> residuals_linpred_plot(type = "quantile")
+```
+That is better, but not great. Additional diagnostics can be created using the `appraise()` function, but the most telling is the QQ plot produced by `qq_plot()`:
+```{r}
+m_ph3 |> qq_plot(method = "simulate")
+```
+
+If the model fitted the data, the black dots would line up within the grey band. Clearly there is still a problem here. We could try to fix the issue by including more variables in the GAM, but for now, we'll leave that as an exercise for another day. Instead, we'll assume the model is OK, and look at how we would plot the estimated response curve.
+
+We can plot the component smooths using the `draw()` method
+
+```{r}
+m_ph3 |> draw()
+```
+However, these are on the link scale, here the logit scale. To visualise the fitted repsonse curve we need to transform back to the response scale, which we do using `conditional_values()`
+```{r}
+m_ph3 |> conditional_values(
+  condition = "pH", exclude = "s(f_sample_id)"
+) |> draw()
+```
+
+::: {.callout-tip}
+
+# Task
+
+Repeat the exercise to look at the species pH response curve to for `AC013A` and / or `BR006A`.
+
+:::
+
+::: {.callout-tip}
+
+# Task
+
+Choose one of the taxa in `swap_sub` and fit a GAM but use a smooth of `DOC` instead of `pH`.
+
+:::

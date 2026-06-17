@@ -30,7 +30,7 @@ knitr:
     fig.height: 6
     fig.width: 10.66666
     collapse: true
-highlight-style: github-dark
+highlight-style: github
 ---
 
 ```{r setup, include=FALSE, cache=FALSE}

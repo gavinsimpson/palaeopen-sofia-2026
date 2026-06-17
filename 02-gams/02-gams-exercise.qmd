@@ -1,0 +1,252 @@
+---
+title: "PalaeoOpen GAM exercise 2"
+author: "Gavin L. Simpson"
+format:
+  html:
+    toc: true
+    html-math-method: katex
+    embed-resources: true
+    monobackgroundcolor: white
+    code-line-numbers: false
+knitr:
+  opts_chunk: 
+    echo: true
+    fig.align: center
+    collapse: true
+highlight-style: github
+---
+
+## Hierarchical generalized additive models
+
+Hierarchical models are used when we have data where the observations are clustered in some way --- a typical example are data where we have measurements on several different taxa or proxies. Instead of fitting each taxon or proxy separately, we fit a single model to all the taxa at once.
+
+In this example we take a brief look at a current research project of mine; the use of distributional models to investigate time-varying changes in the variance of ecological time series.
+
+We begin by loading the packages we will use for this example:
+
+```{r}
+## Packages
+pkgs <- c(
+  "here", "mgcv", "dplyr", "readxl", "tidyr", "gratia", "ggplot2"
+)
+vapply(
+  pkgs, library, logical(1),
+  character.only = TRUE, logical.return = TRUE
+)
+```
+
+If any of these return `FALSE`, install the missing packages and then rerun the code above until all say `TRUE`.
+
+So that you can see how long these models take to fit, install the *tictoc* package if you don't already have it. The code below will do this for you:
+
+```{r}
+#| eval: false
+if (!requireNamespace("tictoc")) install.packages("tictoc")
+```
+
+## Lake 227
+
+The data we will look at are from Lake 227 in the Experimental Lakes Area (ELA), Ontario, Canada. This lake is annually laminated, and Peter Leavitt (Regina) measured the sedimentary pigment values in the lake to compare them with the algal records for the monitoring data in the lake.
+
+These data were also used by Cottingham et al (2000 *Ecology Letters*) in an early statistical approach to modelling changes in variance of an ecosystem, using a Levene's test splitting the time series in to *before* and *after* (or rather *during*) experimental manipulation.
+
+In this exmaple, we'll model the sediment concentrations of several algal pigments in a single GAM using a distributional model to include linear predictors for all of the parameters of the conditional distribution of the response.
+
+## Load data
+
+Load the data from the provide Excel workbook:
+
+```{r}
+lake227 <- read_excel(here("00-data/lake-227.xlsx"))
+lake227
+```
+
+## Data wrangling
+
+We will focus on the main sedimentary pigments or degradation products, and subset the data to just these pigments
+
+```{r}
+## Peter higlighted Fuco, Allox, Lutzeax, Pheo_b, Bcarot
+## take only those variables and year
+vars <- c("YEAR", "FUCO", "ALLOX", "LUTZEAX", "PHEO_B", "BCAROT")
+lake227 <- lake227 |> select(all_of(vars))
+```
+
+Rather than the abbreviations used in the original data, we will add some nicer labels for plotting
+
+```{r}
+names(lake227) <- c(
+  "year", "fucoxanthin", "alloxanthin", "lutein_zeaxanthin",
+  "pheophytin_b", "beta_carotene"
+)
+```
+
+To more closely follow Cottingham *et al* (2000), we restrict our analysis to the period 1943 onward in the lake
+
+```{r}
+lake227 <- lake227 |> filter(year >= 1943)
+```
+
+The final data wrangling step is to transform the data to long format for modelling as we need to have a variable in the data that tells us which pigment data the concentrations belong to
+
+```{r}
+lake227 <- lake227 |>
+  pivot_longer(
+    cols = !year,
+    names_to = "pigment",
+    values_to = "concentration"
+  ) |>
+  mutate(
+    f_pigment = factor(pigment)
+  )
+```
+The last step in the code block above is needed, because *mgcv* requires variables to be factors if they are to be used inside smooth functions.
+
+## Model fitting
+
+Before we fit some example models, we need to turn on some extra options for the fitting process. The `nthreads` option will tell `gam()` to use multiple CPU cores on your laptop *if* the *mgcv* package is configured for parallel processing, and the `trace` argument turns on printing of the fitting process so we can see that something is happening if the model takes a while to fit.
+
+```{r}
+# eval: false
+ctrl <- gam.control(nthreads = 4, trace = TRUE) 
+```
+
+```{r}
+# echo: false
+ctrl <- gam.control(nthreads = 4, trace = FALSE) 
+```
+
+The first model we will fit is once where we have
+
+* a smooth of `year` for each pigment, to model the change in the mean, $\mu_j$, concentration for the respective pigment over time,
+* a constant term for the Tweedie power parameter $p$; some preliminary exploration suggests that the data do not support anything more complex for $p$, and
+* a simgle smooth of `year` for the scale parameter, $\phi$, of the distribution
+
+Together, $\mu$, $p$, and $\phi$ combine to give the conditional variance of the response at any value of `year`, separately for each pigment.
+
+We now fit this model in *mgcv*. Distributional models require a list of formulas, only the first of which have a left-hand side. This is the linear predictor for the mean. The second formula is the linear predictor for $p$, and the third formular the linear predictor for $\phi$. Note I have suppressed all the model `trace` output here, but you will see a lot of gibberish printed to the console as the model fits.
+
+```{r}
+tictoc::tic()
+mtwlss0 <- gam(
+  list(
+    concentration ~ s(year, f_pigment, bs = "fs", k = 10), # mean
+                  ~ 1,               # power, intercept only
+                  ~ s(year, k = 10)  # scale
+  ),
+  data = lake227,
+  family = twlss,
+  optimizer = "efs", # twlss can be more stable w. Extended Fellner Schall
+  method = "REML",   # REML smoothness selection
+  control = ctrl
+)
+tictoc::toc()
+```
+
+The `tic()` and `toc()` calls are what will tell you about the the timing of the model fits.
+
+A more complex model would be one that allows each pigment to have a different trend in the scale parameter, $\phi_j$. We fit this model now, which will comprise
+
+* a smooth of `year` for each pigment, to model the change in the mean, $\mu_j$, concentration for the respective pigment over time,
+* a constant term for the Tweedie power parameter $p$; some preliminary exploration suggests that the data do not support anything more complex for $p$, and
+* a smooth of `year` for each pigment for the scale parameter, $phi_j$, of the distribution
+
+Note that there is less information about the other distributional parameters in the data than there is for the mean. As such, we don't expect the smooths for $\phi_j$ to be sa complex as the ones for the means $\mu_j$, so we set `k` a little lower than the default (of `10`) in the fit below
+
+```{r}
+tictoc::tic()
+mtwlss <- gam(
+  list(
+    concentration ~ s(year, f_pigment, bs = "fs", k = 10),
+                  ~ 1,
+                  ~ s(year, f_pigment, bs = "fs", k = 6)
+  ),
+  data = lake227,
+  family = twlss,
+  optimizer = "efs", # twlss can be more stable w. Extended Fellner Schall
+  method = "REML", # REML smoothness selection
+  control = ctrl
+)
+tictoc::toc()
+```
+
+A crude comparison of the models in terms of predictive performance only is provide by `AIC()` --- note that I'm only using this here to show that the more complex model has considerable support over the first mdoel we fitted.
+
+```{r}
+AIC(mtwlss0, mtwlss)
+```
+
+The model summary for the more complex model shows that both sets of smooths are statistically interesting
+```{r}
+summary(mtwlss)
+```
+
+We should check the model diagnostics, to see if were are consistent with the assumptions of the model --- note this plot will take a few seconds to produce as it needs to simulate data from the fitted Tweedie distributions
+```{r}
+appraise(mtwlss)
+```
+
+Nothing seems to untoward here, in fact these diagnostics are pretty good really.
+
+The component smooths, on the link (log) scale are plotting using the `draw()` method:
+```{r}
+draw(mtwlss)
+```
+
+Although we can't directly read off the variance of the Tweedie distributions here, we can infer that it is increasing faster than the mean-variance relationship of the Tweedie with constant scale parameters for each pigment, as the trends in the linear predictor for $\phi_j$ are all increasing over time.
+
+The final diagnostic check we will perform is to look to see if the original basis size was large enough.
+```{r}
+k.check(mtwlss)
+```
+
+The reported values of `k-index` are all well below 1, suggesting a problem. However, this heuristic test is not designed with time series in mind and unmodelled autocorrelation can cause this test to reject the null hypothsis. 
+
+Here, the issue really is unmodelled or residual autocorrelation; handling this will require the use of the new neighbourhood cross validation method of Simon Wood, which we use in fitting via `method = "NCV"` and providing a suitable object to the `nei` argument. This is not something we can do today however, but watch this space; after eight or nine years working on this data set, sporadically, I will soon have a paper ready on the method with the Lake 227 fits as one of the examples demonstrating the technique.
+
+A further task is to convert the estimated smooths into estimated means and variances for each pigment. This requires some non-trivial math to undo the internal parameterisations used by *mgcv*, which thankfully is handled for us by *gratia*, but we restrict ourselves to plotting the trends in the pigment mean concentrations over time.
+
+First, we need a data slice through the original data, such that we will predict at 100 evenly-spaced values of `year`, repeated for each pigment:
+
+```{r}
+ds <- mtwlss |> data_slice(
+  year = evenly(year, n = 100),
+  f_pigment = evenly(f_pigment)
+)
+```
+
+Next, we use the `fitted_values()` function to generate model estimates for each parameter of the distribution for each of the data values in `ds`:
+
+```{r}
+fv <- mtwlss |>
+  fitted_values(
+    data = ds
+  )
+```
+If we look at what is produced
+```{r}
+fv
+```
+we see a `.parameter` variable that indicates to which parameter of the distribution each fitted value pertains. We will use the `location` values as these are the ones for the mean, $\mu_j$.
+
+We filter to just the location parameter, bind on the covariate values we predicted at, and then plot the estimated pigment concentrations over time, with a credible interval:
+```{r}
+fv |>
+  filter(.parameter == "location") |> # only conditional means
+  bind_cols(ds) |> # bind on covariate values predicted at
+  ggplot(          # plot
+    aes(x = year, y = .fitted, colour = f_pigment)
+  ) +
+    geom_ribbon(   # credible interval
+      aes(
+        ymin = .lower_ci, max = .upper_ci,
+        fill = f_pigment, colour = NULL
+      ),
+      alpha = 0.1
+    ) +
+    geom_line()    # fitted values
+```
+
+#### References
+
+Cottingham, K.L., Rusak, J.A., Leavitt, P.R., 2000. Increased ecosystem variability and reduced predictability following fertilisation: Evidence from palaeolimnology. Ecol. Lett. 3, 340–348. <https://doi.org/10.1046/j.1461-0248.2000.00158.x>
