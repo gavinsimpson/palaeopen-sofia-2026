@@ -29,3 +29,5 @@ Unless stated otherwise, all training materials in this repository are licensed 
 * Slides on [vegan](https://gavinsimpson.github.io/palaeopen-sofia-2026/03-vegan/vegan.html)
 
 * [Vegan exercise](https://gavinsimpson.github.io/palaeopen-sofia-2026/03-vegan/01-vegan-exercise.html)
+
+* [Vegan exercise](https://gavinsimpson.github.io/palaeopen-sofia-2026/03-vegan/02-vegan-exercise-2.html)
