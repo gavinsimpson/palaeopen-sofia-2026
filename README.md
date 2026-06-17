@@ -25,3 +25,7 @@ Unless stated otherwise, all training materials in this repository are licensed 
 * [GAM exercise 1](https://gavinsimpson.github.io/palaeopen-sofia-2026/02-gams/01-gam-exercise.html)
 
 * [GAM exercise 2](https://gavinsimpson.github.io/palaeopen-sofia-2026/02-gams/02-gams-exercise.html)
+
+* Slides on [vegan](https://gavinsimpson.github.io/palaeopen-sofia-2026/03-vegan/vegan.html)
+
+* [Vegan exercise](https://gavinsimpson.github.io/palaeopen-sofia-2026/03-vegan/01-vegan-exercise.html)

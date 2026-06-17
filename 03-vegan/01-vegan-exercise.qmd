@@ -1,0 +1,151 @@
+---
+title: "PalaeoOpen Vegan exercise"
+author: "Gavin L. Simpson"
+format:
+  html:
+    toc: true
+    html-math-method: katex
+    embed-resources: true
+    monobackgroundcolor: white
+    code-line-numbers: false
+knitr:
+  opts_chunk: 
+    echo: true
+    fig.align: center
+    collapse: true
+highlight-style: github
+---
+
+Load some packages
+
+```{r}
+library("here")
+library("analogue")
+library("vegan")
+library("ggvegan")
+library("cepreader")
+```
+
+If any of these do not load without error, install the package and try again.
+
+Here we create a plot of the Abernethy Forest data
+
+```{r}
+data(abernethy)
+Stratiplot(Age ~ . - Depth, 
+           data = chooseTaxa(abernethy, n.occ = 3, max.abun = 5),
+           type = "poly")
+```
+
+Subset the data to just the species counts
+
+```{r}
+aber <- abernethy[, 1:36]
+```
+
+Fit a PCA
+
+```{r}
+aber_pca <- pca(decostand(aber, method = "hellinger"))
+```
+
+and plot it:
+
+```{r}
+ordipointlabel(aber_pca)
+```
+
+Now fit a CA
+
+```{r}
+aber_ca <- ca(decostand(aber, method = "total"))
+```
+
+and plot it
+
+```{r}
+ordipointlabel(aber_ca)
+```
+
+How many axes should we consider? Plot a screeplot of $\lambda$ and decide
+
+```{r}
+screeplot(aber_pca, type = "l", bstick = TRUE)
+```
+
+How many axes should we consider for the CA? Plot a screeplot of $\lambda$ and decide
+
+```{r}
+screeplot(aber_ca, type = "l", bstick = TRUE)
+```
+
+Sometimes we want to extract and plot the axis scores. Here we do this for the PCA axis 1 scores
+
+```{r}
+plot(
+  abernethy$Age,
+  scores(aber_pca, choices = 1, display = "sites", scaling = "sites")[,1],
+  type = "b", xlim = rev(range(abernethy$Age)), ylab = "PCA axis 1 score", xlab = "Age"
+)
+```
+
+And here for the CA axis 2 scores
+```{r}
+plot(
+  abernethy$Age,
+  scores(aber_ca, choices = 2, display = "sites", scaling = "sites")[,1],
+  type = "b", xlim = rev(range(abernethy$Age)), ylab = "CA axis 2 score", 
+  xlab = "Age"
+)
+```
+
+In this part fo the exercise, we will fit a CCA to the SWAP diatom training set using a suite of the chemistry variables as predictors. We will then superimpose a core data set from the RLGH on to the CCA of the training data.
+
+Begin by loading the data:
+
+```{r}
+swap138 <- vegan::read.cep(here("00-data/swap138.cep"))
+swap138 <- chooseTaxa(swap138, max.abun = 2)
+
+swapenv <- cepreader::readCEP(here("00-data/swap138.log"))
+```
+
+Now fit the CCA with selected chemistry variables
+
+```{r}
+mod <- cca(swap138 ~ Altot + Cl + TOC + SO4 + Cond + Mg + K + Ca + Equal + pH,
+           data = swapenv)
+```
+
+Produce plots of the ordination with species and sites separately. First for the samples
+```{r}
+plot(mod, display = c("sites", "bp"), scaling = "symmetric", type = "n")
+ordipointlabel(mod, display = c("sites"), scaling = "symmetric", add = TRUE,
+               cex = c(0.7,0.7))       
+```
+
+And now for the species
+
+```{r}
+plot(mod, display = c("species", "bp"), scaling = "symmetric", type = "n")
+ordipointlabel(mod, display = c("species"), scaling = "symmetric", add = TRUE,
+               cex = c(0.7,0.7))       
+text(mod, display = "bp", col = "blue")
+```
+
+Now we can load the RLGH core data and fit the timetrack ordination
+```{r}
+data(rlgh)
+mod2 <- timetrack(
+  swap138, rlgh, 
+  env = swapenv,
+  method = "cca",
+  formula = ~ Altot + Cl + TOC + SO4 + Cond + Mg + K + Ca + Equal + pH
+)
+```
+And the we can plot the timetrack:
+
+```{r}
+plot(mod2)
+text(mod2$ordination, display = "bp", col = "blue")
+```
