@@ -44,6 +44,7 @@ library("dplyr")
 library("mgcv")
 library("gratia")
 library("readr")
+library("tidyr")
 
 library("readxl")
 library("here")
@@ -87,7 +88,7 @@ When I talk about statistical thinking and applying it to palaeo data, I'm think
 
 :::
 
-# Multivariate data {background-gradient="linear-gradient(to bottom, #283b95, #17b2c3)"}
+# Multivariate data {background-color="black" background-gradient="linear-gradient(to bottom, #283b95, #17b2c3)"}
 
 ## Tradition
 
@@ -113,7 +114,7 @@ The traditional methods haven't stopped working
 
 But at some point they may hold us back
 
-# Topic models {background-gradient="linear-gradient(to bottom, #283b95, #17b2c3)"}
+# Topic models {background-color="black" background-gradient="linear-gradient(to bottom, #283b95, #17b2c3)"}
 
 ## Complex multivariate species data
 
@@ -364,9 +365,9 @@ For more on topic models & esp related to eDNA
 
 [Sankaran, K., Holmes, S.P., 2019. *Biostatistics* 20, 599–614.](https://doi.org/10.1093/biostatistics/kxy018)
 
-# Rate of change {background-gradient="linear-gradient(to bottom, #283b95, #17b2c3)"}
+# Rate of change {background-color="black"background-gradient="linear-gradient(to bottom, #283b95, #17b2c3)"}
 
-```{r roc-setup, echo = FALSE, results = "hide" cache=TRUE}
+```{r roc-setup, echo = FALSE, results = "hide", cache=TRUE}
 # load the data from Pangaea
 res <- pg_data(doi = "10.1594/PANGAEA.857573")
 foram <- res[[1]]$data |>
@@ -386,6 +387,9 @@ xlabel <- "Age [ka BP]"
 # fit the model
 m <- gam(d18O ~ s(neg_age, k = 100, bs = "ad"), data = foram, method = "REML")
 ```
+
+## Rate of change
+
 Knowing how quickly systems changed in the past can be used a to put current or future rates of change in context
 
 Long history of RoC analysis in palaeo (Birks & Gordon, 1985) & recent updates ([RRatepol 📦 Ondřej Mottl](https://doi.org/10.1016/j.revpalbo.2021.104483))
@@ -463,6 +467,7 @@ We do actually have an equation but we'd need to figure it out and that is tedio
 For a single variable, this is relatively simple
 
 ```{r display-foram-data, dependson = "roc-setup", out.width = "80%", fig.align = "center"}
+#| echo: false
 ggplot(foram, aes(y = d18O, x = Age_kaBP)) +
   geom_path() +
   scale_x_reverse(sec.axis = sec_axis( ~ 1950 - (. * 1000),
@@ -483,6 +488,7 @@ Oxygen isotope composition δ18O of planktonic foraminifera in one of the cores 
 ## Estimate the trend
 
 ```{r display-foram-gam, dependson = "roc-setup"}
+#| echo: false
 ds <- data_slice(m, neg_age = evenly(neg_age, 300))
 fv <- fitted_values(m, data = ds) |>
     mutate(Age_kaBP = -neg_age) # (t * (max_agebp - min_agebp) + min_agebp))
@@ -502,6 +508,7 @@ fv |>
 ## Compute derivatives = RoC
 
 ```{r display-foram-derivs, dependson = "roc-setup"}
+#| echo: false
 # compute first derivative of the smooth
 fd <- derivatives(m, data = ds, type = "central")
 fd |>
@@ -569,8 +576,9 @@ Instead we could use a topic model
 After application of the topic model we are typically fitting a Dirichlet model to the proportions of a few (<= 10) associations of species
 
 ```{r topic-model-setup}
+#| echo: false
 ## Load data
-aber <- read_rds(here("data", "abernethy-count-data.rds"))
+aber <- read_rds(here("00-data", "abernethy-count-data.rds"))
 ## or:
 # aber <- read_rds("https://bit.ly/abercount")
 
@@ -588,9 +596,7 @@ take <- c("BETULA", "PINUS_SYLVESTRIS", "ULMUS", "QUERCUS", "ALNUS_GLUTINOSA",
           "SAXIFRAGA_GRANULATA", "SAXIFRAGA_HIRCULUS_TYPE", "SAXIFRAGA_NIVALIS",
           "SAXIFRAGA_OPPOSITIFOLIA", "SAXIFRAGA_UNDIFFERENTIATED", "SEDUM",
           "URTICA", "VERONICA")
-## Don't do this!
-##take <- c(1,2,3,4,6,10,11,12,14,15,39,40,41,42,43,46,49,50,53,54,57,58,59,60,67,
-##          69,70,72,74,75,83,85,86)
+
 aber <- aber[, take]
 ## are any columns now all zeroes?
 all_missing <- unname(vapply(aber, function(x) all(is.na(x)), logical(1)))
@@ -605,7 +611,7 @@ cs <- colSums(aber) > 0L
 aber <- aber[, cs]
 names(aber) <- tolower(names(aber))
 ## aber ages
-aber_age <- read_rds(here("data", "abernethy-sample-age.rds"))
+aber_age <- read_rds(here("00-data", "abernethy-sample-age.rds"))
 ## or:
 # aber_age <- read_rds("https://bit.ly/aberage")
 
@@ -617,7 +623,9 @@ ctrl <- replicate(reps, list(seed = 42), simplify = FALSE)
 ## repeat the data n times to facilitate `mapply`
 aberrep <- replicate(reps, aber, simplify = FALSE)
 # fit the sequence of topic models
+# tictoc::tic()
 tms <- mapply(LDA, k = k, x = aberrep, control = ctrl)
+# tictoc::toc()
 
 ## extract model fit in terms of BIC and plot
 # plot(k, sapply(tms, AIC, k = log(nrow(aber)))) # not in talk
@@ -681,8 +689,8 @@ if (FALSE) { ## Don't refit in the slides! Needs cmdstanr backend - memory!
 } else {
     # instead load the model files
     # load the model (saved - not in repo!
-    m  <- read_rds(here("models/aber-dirichlet.rds"))
-    m2 <- read_rds(here("models/aber-dirichlet-phi.rds"))
+    m  <- read_rds(here("04-fancy-stuff/models/aber-dirichlet.rds"))
+    m2 <- read_rds(here("04-fancy-stuff/models/aber-dirichlet-phi.rds"))
 }
 
 # new data for plotting & derivatives
@@ -705,10 +713,10 @@ if (FALSE) { # something weird going on if you process models locally, fitted el
     write_rds(fv1_samps, "models/aber-dirichlet-fitted-samples.rds")
     write_rds(fv2_samps, "models/aber-dirichlet-phi-fitted-samples.rds")
 } else { # so load the posterior draws saved previously
-    fv1 <- read_rds(here("models/aber-dirichlet-fitted-summary.rds"))
-    fv2 <- read_rds(here("models/aber-dirichlet-phi-fitted-summary.rds"))
-    fv1_samps <- read_rds(here("models/aber-dirichlet-fitted-samples.rds"))
-    fv2_samps <- read_rds(here("models/aber-dirichlet-phi-fitted-samples.rds"))
+    fv1 <- read_rds(here("04-fancy-stuff/models/aber-dirichlet-fitted-summary.rds"))
+    fv2 <- read_rds(here("04-fancy-stuff/models/aber-dirichlet-phi-fitted-summary.rds"))
+    fv1_samps <- read_rds(here("04-fancy-stuff/models/aber-dirichlet-fitted-samples.rds"))
+    fv2_samps <- read_rds(here("04-fancy-stuff/models/aber-dirichlet-phi-fitted-samples.rds"))
 }
 
 # need to extract and wrangle the fvs into the required format
@@ -771,7 +779,215 @@ if (FALSE) {
     write_rds(fd1_samps, "models/aber-dirichlet-fitted-samples-derivs.rds")
     write_rds(fd2_samps, "models/aber-dirichlet-phi-fitted-samples-derivs.rds")
 } else {
-    fd1_samps <- read_rds(here("models/aber-dirichlet-fitted-samples-derivs.rds"))
-    fd2_samps <- read_rds(here("models/aber-dirichlet-phi-fitted-samples-derivs.rds"))
+    fd1_samps <- read_rds(here("04-fancy-stuff/models/aber-dirichlet-fitted-samples-derivs.rds"))
+    fd2_samps <- read_rds(here("04-fancy-stuff/models/aber-dirichlet-phi-fitted-samples-derivs.rds"))
 }
 ```
+
+## Dirichlet GAM
+
+:::: {.columns}
+
+::: {.column width=50%}
+% sand, silt clay
+
+Such data lie on a simplex; $k$ classes have $k-1$ dimensions
+
+Fitted using brms 📦 & Stan
+
+:::
+
+::: {.column width=50%}
+![](/resources/page1-1280px-Dirichlet.jpg)
+:::
+
+::::
+
+```{r dirichlet-explanation}
+head(aber_topics)
+```
+
+::: {.notes}
+
+Having reduced the many taxa to a few associations, we model their proportions with a Dirichlet GAM
+
+The classic example of Dirichlet distributed data is % sand, silt, and clay. You only need two of these to deduce all three proportions
+
+Technically we say such data (samples) lie on a simplex with 1 fewer dimensions than "types"
+
+:::
+
+## Abernethy Forest
+
+```{r abernethy-strat-plot, out.width = "90%"}
+#| echo: false
+aber_tmp <- aber |>
+    bind_cols(aber_age) |>
+    as.data.frame()
+Stratiplot(Age ~ .,
+    data = chooseTaxa(aber_tmp, n.occ = 5, max.abun = 50),
+    type = "poly")
+```
+
+Birks & Mathewes (1978) _New Phytologist_ **80**, 455-484.
+
+::: {.notes}
+
+To illustrate the approach I'll use the classic late glacial pollen data from Abernethy Forest, Scotland, of Birks and Mathewes
+
+:::
+
+## Trends in species associations
+
+```{r plot-dirichlet-trends, dependson = -3}
+#| echo: false
+fvs |>
+    ggplot(aes(x = age, y = proportion, colour = association)) +
+    geom_ribbon(aes(x = age, ymin = lower, ymax = upper,
+        fill = association), inherit.aes = FALSE, alpha = 0.2) +
+    geom_line(linewidth = 1.5) +
+    # geom_point(data = topic_df_long,
+    #     mapping = aes(x = age, y = proportion, colour = association)) +
+    scale_x_reverse() +
+    labs(x = "Age (years BP)", y = "Relative abundance")
+```
+
+::: {.notes}
+
+Firstly, we estimate the trends in the relative composition of each association of taxa using the Dirichlet GAM
+
+:::
+
+## Compute derivatives of trends
+
+```{r plot-dirichlet-derivatives, dependson = -4, cache=TRUE}
+#| echo: false
+# used more points (200) for the derivatives samples... :cry
+new_df <- with(topic_df, tibble(age = seq(min(age), max(age), length = 200))) |>
+    mutate(neg_age = -age,
+        t = 1 - ((age - min(age)) / (max(age) - min(age))))
+fd_dif <- (fd2_samps[, 1:200, ] - fd2_samps[, 201:400, ]) / eps
+
+# work on the columns
+fd_med <- apply(fd_dif, 2:3, quantile, probs = 0.5) |>
+    as_tibble() |>
+        pivot_longer(cols = everything(), # pivot
+            names_pattern = "assoc([[:digit:]]{1})",
+            names_to = "association",
+            values_to = "derivative")
+
+fd_lwr <- apply(fd_dif, 2:3, quantile, probs = 0.025) |>
+    as_tibble() |>
+    pivot_longer(cols = everything(), # pivot
+        names_pattern = "assoc([[:digit:]]{1})",
+        names_to = "association",
+        values_to = "lower")
+
+fd_upr <- apply(fd_dif, 2:3, quantile, probs = 0.975) |>
+    as_tibble() |>
+        pivot_longer(cols = everything(), # pivot
+            names_pattern = "assoc([[:digit:]]{1})",
+            names_to = "association",
+            values_to = "upper")
+
+fd_df <- fd_med |>
+    bind_cols(fd_lwr[, "lower"]) |>
+    bind_cols(fd_upr[, "upper"]) |>
+    tibble::add_column(age = rep(new_df$age, each = k_take),
+        neg_age = rep(new_df$neg_age, each = k_take),
+        t = rep(new_df$t, each = k_take), .before = 1L)
+
+fd_df |>
+    ggplot(aes(x = age, y = derivative, colour = association)) +
+    geom_line(linewidth = 1.5) +
+    scale_x_reverse() +
+    labs(x = "Age (years BP)", y = "Derivative")
+```
+
+::: {.notes}
+
+Then we compute the derivatives of those trends using finite differences
+
+:::
+
+## Take the absolute values |d|
+
+```{r plot-dirichlet-abs-derivatives, dependson = -1}
+#| echo: false
+fd_df |>
+    ggplot(aes(x = age, y = abs(derivative), colour = association)) +
+    geom_line(linewidth = 1.5) +
+    scale_x_reverse() +
+    labs(x = "Age (years BP)", y = "| derivative |")
+```
+
+::: {.notes}
+
+We take the absolute value of the derivatve as decreases are as important as increases
+
+:::
+
+## Sum |d| at each time point - RoC
+
+```{r plot-dirichlet-roc, dependson = -2}
+#| echo: false
+fd_df |>
+    group_by(age) |>
+    summarise(rate_of_change = sum(abs(derivative))) |>
+    ggplot(aes(x = age, y = rate_of_change)) +
+    geom_line(linewidth = 1.5) +
+    scale_x_reverse() +
+    labs(x = "Age (years BP)", y = "Rate of compositional change")
+
+```
+
+::: {.notes}
+
+And then we sum the absolute derivative to get our estimate of the rate of change or turnover
+
+:::
+
+##
+
+```{r compare-with-rratepol}
+#| echo: false
+library("RRatepol")
+
+aber2 <- cbind.data.frame(sample_id = as.character(seq_len(nrow(aber))), aber)
+rownames(aber2) <- NULL
+aber_age2 <- aber_age |> rename(age = Age) |>
+    tibble::add_column(aber_age,
+        sample_id = as.character(seq_len(nrow(aber_age))), .before = 1L) |>
+    as.data.frame()
+rownames(aber_age2) <- NULL
+
+aber_rp <- estimate_roc(
+  data_source_community = aber2,
+  data_source_age = aber_age2,
+  smooth_method = "age.w",
+  dissimilarity_coefficient = "chord",
+  working_units = "levels",
+  bin_size = 200
+)
+
+library("ggtext")
+fd_df |>
+    group_by(age) |>
+    summarise(rate_of_change = sum(abs(derivative))) |>
+    ggplot(aes(x = age, y = rate_of_change)) +
+    geom_line(linewidth = 1.5, colour = "#56B4E9") +
+    geom_line(data = aber_rp,
+        mapping = aes(x = Age, y = ROC * 12), colour = "#E69F00",
+        linewidth = 1.5) +
+    scale_x_reverse() +
+        labs(x = "Age (years BP)", y = "Rate of compositional change",
+            title = "RoC based on <span style = 'color:#56B4E9;'>Dirichlet GAM</span> and <span style = 'color:#E69F00;'>RRatepol</span>") +
+    theme(plot.title = element_markdown(size = 26),
+    plot.title.position = "plot")
+```
+
+::: {.notes}
+
+If we compare with a basic run of RRatepol, we see similar features in the rate of change, but there are differences in some of the detail that are worthy of further investigation
+
+:::

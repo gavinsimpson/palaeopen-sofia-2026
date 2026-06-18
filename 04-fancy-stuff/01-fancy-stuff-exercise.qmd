@@ -1,0 +1,439 @@
+---
+title: "PalaeoOpen Fancy Stuff exercise"
+author: "Gavin L. Simpson"
+format:
+  html:
+    toc: true
+    html-math-method: katex
+    embed-resources: true
+    monobackgroundcolor: white
+    code-line-numbers: false
+knitr:
+  opts_chunk: 
+    echo: true
+    fig.align: center
+    collapse: true
+highlight-style: github
+---
+
+## Fit a Topic Model to the Abernethy Forest data set
+
+In this exercise you will work with the relatively clean and simple Abernethy Forest data set covering the late glacial to earl Holocene period.
+
+## Load packages
+
+Begin by installing some new packages that will be required for this exercise. The packages we will need that we haven't seen thus far are:
+```{r}
+new_pkgs <- c(
+  "servr", "topicmodels", "stm", "analogue", "LDAvis", "ggvegan",
+  "DirichletReg"
+)
+```
+Now install these packages:
+```{r}
+#| eval: false
+install.packages(new_pkgs)
+```
+
+We need several additional packages, but these either come with R or we have used previously on the course, so we prepend `new_pkgs` to the list of additional packages, to create a full list that we can load
+```{r}
+all_pkgs <- c(
+  new_pkgs, "here", "readr", "ggplot2", "tidyr", "splines", "dplyr"
+)
+```
+As previsouly, we load the packages we need into the R session using a short `vapply()` call:
+```{r}
+#| message: false
+vapply(
+  all_pkgs, library, logical(1),
+  character.only = TRUE, logical.return = TRUE
+)
+```
+
+## Load the data
+
+The data have already been cleaned and processed in R, so we can load them from a serialized object saved as a `.rds` file. First we load the pollen data
+```{r}
+## first Abernethy pollen counts
+aber <- read_rds(here("00-data/abernethy-count-data.rds"))
+## or:
+## aber <- read_rds(url("http://bit.ly/abercount"))
+```
+and then we load the radio carbon ages for each sample
+```{r}
+## then Abernethy forest sample ages
+aberAge <- read_rds(here("00-data/abernethy-sample-age.rds"))
+## or:
+## aberAge <- read_rds(url("http://bit.ly/aberage"))
+```
+
+We use a subset of the taxa, mainly those that are well identified in the data set compared with unknown or compound taxa.
+```{r}
+## take a subset of spp
+take <- c(
+  "BETULA", "PINUS_SYLVESTRIS", "ULMUS", "QUERCUS",
+  "ALNUS_GLUTINOSA", "CORYLUS_MYRICA", "SALIX",
+  "JUNIPERUS_COMMUNIS", "CALLUNA_VULGARIS",
+  "EMPETRUM", "GRAMINEAE", "CYPERACEAE", "SOLIDAGO_TYPE",
+  "COMPOSITAE_LIGULIFLORAE", "ARTEMISIA",
+  "CARYOPHYLLACEAE_UNDIFFERENTIATED",
+  "SAGINA", "SILENE_CF_S_ACAULIS", "CHENOPODIACEAE",
+  "EPILOBIUM_TYPE", "PAPILIONACEAE_UNDIFFERENTIATED",
+  "ANTHYLLIS_VULNERARIA", "ASTRAGALUS_ALPINUS", "ONONIS_TYPE", 
+  "ROSACEAE_UNDIFFERENTIATED", "RUBIACEAE",
+  "RANUNCULACEAE_UNDIFFERENTIATED", "THALICTRUM",
+  "RUMEX_ACETOSA_TYPE", "OXYRIA_TYPE", "PARNASSIA_PALUSTRIS",
+  "SAXIFRAGA_GRANULATA", "SAXIFRAGA_HIRCULUS_TYPE",
+  "SAXIFRAGA_NIVALIS", "SAXIFRAGA_OPPOSITIFOLIA", 
+  "SAXIFRAGA_UNDIFFERENTIATED", "SEDUM", "URTICA", "VERONICA"
+)
+aber <- aber |> select(all_of(take))
+```
+
+Currently, where a taxon was not observed in a sample, it's value in the `aber` object is `NA`; we want to change these `NA`s to `0`s to indicate that a taxon was not observed in that sample. Here, we use the `tran()` function from the *analogue* 📦 and it's `"missing"` method to achieve this replacement:
+```{r}
+## change all the NA to 0s
+aber <- tran(aber, method = "missing")
+```
+
+Some of the package for fitting topic models require the data to be very clean, and do not tolerate any inconsistencies with what they expect to be provided. One issue that can occur when loading data from legacy formats is that the observations can get coded as character strings. Here we check that all the variables in `aber` are numeric:
+```{r}
+## check that all remaining values are numeric
+stopifnot(
+  all(
+    vapply(
+      aber, data.class, character(1), USE.NAMES = FALSE
+    ) == "numeric"
+  )
+)
+```
+
+Another check we need to perform is to confirm that each pollen taxon is observed in at least one sample. We do this by summing up the counts for each taxon, and retaining only those taxa with a positive count sum.
+```{r}
+## check all columns still have at least 1 positive count
+cs <- colSums(aber) > 0L
+aber <- aber[, cs]
+```
+
+A final step is to convert the names from upper case to lower case, as these look a little better in the output.
+```{r}
+names(aber) <- tolower(names(aber))
+```
+
+## Fitting topic models
+
+Having got the data in the required format, we can now start to fit topic models to them. When using the *topicmodels* 📦, we need to to fit models with a stated number of topics. It is not possible to automatically choose the number of topics using the `LDA()` function from *topicmodels* 📦.
+
+To try to attempt to find an optimal number of topics, we will fit LDA models with $j \in {1, 2, \dots, 10}$ topics, and then we will look to see which of these models fits the data "best".
+
+To facilitate this, we replicate the data nine times, and make sure that the sme random seed (`2026-6-18`) is used for each model fit to ensure we are comparing models that are initiated from the same starting points.
+```{r}
+## Models to fit
+k <- 2:10 # 2, 3, ... 10 associations / groups
+## setting the same random seed for each model
+reps <- length(k)
+ctrl <- replicate(reps, list(seed = 2026-6-18), simplify = FALSE)
+## repeat the data n times to facilitate `mapply`
+aberrep <- replicate(reps, aber, simplify = FALSE)
+```
+
+We use the `mapply()` function here to fit the set of topic models. This will take a few seconds to a couple of minutes, depending on how powerful your laptop is:
+```{r}
+#| message: false
+# fit the sequence of topic models
+tms <- mapply(LDA, k = k, x = aberrep, control = ctrl)
+```
+
+Choosing the number of topics is not trivial, and many approaches have been advocated at one time or another. With the `LDA()` models, we have few options other than to use AIC to assess model fit. It should be noted that for topic models, AIC does not work as well as it does with normal models with likelihoods. So use this as a weak guide as to the "correct" number of topics; here adding an extra penalty means we are using BIC instead.
+```{r}
+## extract model fit in terms of BIC and plot
+plot(k, sapply(tms, AIC, k = log(nrow(aber))))
+```
+
+The plot of BIC values rapidly declines as the number of topics increases from two to four, but thereafter the gains are more modest with increasing numbers of topics.
+
+For the purposes of illustrating the features of a topic model, here we choose five (5) topics, and proceed to extract this model from `tms` for subsequent analysis:
+```{r}
+## so 5 groups looks OK ? but 6 or 7 also OK
+k.take <- 5
+## which is the 5 group model?
+k.ind <- which(k == k.take)
+## could also selected purely on BIC terms...
+k.bic <- which.min(sapply(tms, AIC, k = log(nrow(aber))))
+## but we'll take the model with 5 groups
+aberlda <- tms[[k.ind]]
+```
+
+It should be noted, however, that with models fitted using `LDA()` that it is worthwhile trying a range of models around the chosen number of topics. If your conclusions are not affected by the specific number of topics, then they are insensitive and we can have greater faith in those conclusions.
+
+Having chosen a topic model to work with, we next extract the posterior distribution of the topic model, and from this we extract the topic and term proportions.
+```{r}
+## extract the posterior fitted distribution of the model
+aberPosterior <- posterior(aberlda)
+## topic proportions
+aberTopics <- aberPosterior$topics
+## term proportions
+aberTerms <- aberPosterior$terms
+```
+
+Thes evalues will be used to visualise the topic model, and subsequently in a regression model.
+
+## Visualise with LDAvis package
+
+As with many multivariate methods, exploring what the topic model has encoded about the data set is non-trivial and requires some effort. Usually, this will involve visualisationn of the topic proportions and interactive exploration is typical.
+
+In this section you will use the *LDAvis* package to explore the estimated topics interactively.
+
+This requires a little setup for `LDA()` models. First we have a wrapper function that collects the necessary information from the topic model object:
+
+```{r}
+## LDAvis
+## Need a wrapper to automate this process
+wrapper <- function(lda, data, ...) {
+    phi   <- as.matrix(posterior(lda)$terms)
+    theta <- as.matrix(posterior(lda)$topics)
+    vocab <- colnames(phi)
+    doc.length <- unname(rowSums(data))
+    term.frequency <- unname(colSums(data))
+    LDAvis::createJSON(phi = phi, theta = theta, vocab = vocab,
+                       doc.length = doc.length,
+                       term.frequency = term.frequency,
+                       ...)
+}
+```
+
+*LDAvis* will display an ordination of the topic proportions. You can control this ordinatiojn by providing a function that will return the ordination scores for whatever ordination method you wish to use. Here, by way of an example, I will create a wrapper function that applies PCA to the Hellinger transformed topic proportions:
+
+```{r}
+## and wrappers to apply ordination method for display
+pcahWrapper <- function(phi) {
+    scores(pca(decostand(phi, method = "hellinger")), choices = 1:2,
+           display = "sites", scaling = "sites")
+}
+```
+
+The final step is to wrap all of this into a JSON object than can be read by the interactive Shiny app:
+```{r}
+## apply our wrapper, here with PCA on Hellinger transformed topic proportions
+aberJSON <- wrapper(aberlda, aber, mds.method = pcahWrapper)
+```
+
+With the required information to hand in JSON format, we can run the Shiny app:
+```{r}
+#| eval: false
+## run the shiny app to explore the data
+serVis(aberJSON)
+```
+This will open the app in the Viewer pane in RStudio, but you can also get this to display in your web browser instead. Don't worry too much about some of the metrics that are shown in the app; these are intended for data sets that are text documents. The main use of this visualisation from a palaeo-perspective is to help you see which topics are similar and dissimilar to one another, and also to help you understand which taxa are more prevalent in which topics.
+
+## Visualising the topic proportions over time
+
+The next thing we want to do is explore how the topic proportions vary over time in the core.
+
+Again, this urrently requires some helper functions, some rearrangement of the data into a form suitable for plotting, etc.
+
+We first start with a function that I forget exactly what is doing:
+```{r}
+visArea <- function(topics, data) {
+    Nk <- as.vector(t(topics) %*% rowSums(data))
+    names(Nk) <- colnames(topics)
+    Nk / sum(Nk)
+}
+```
+
+Then we would like to arrange the topics so that they are drawn in time "order"; we do this by computing a weighted average optima for "time" for each topic, which we use later to order the levels of the factor indexing the topics.
+```{r}
+## get "time" WA optima to sort topics
+aberPosterior <- posterior(aberlda)
+aberTopics <- aberPosterior$topics
+aberTerms <- aberPosterior$terms
+colnames(aberTopics) <- seq_len(k.take)[rank(-visArea(aberTopics, aber))]
+aberTopics <- aberTopics[, as.character(seq_len(k.take))]
+lda_waopt <- optima(as.data.frame(aberTopics), env = aberAge$Age)
+```
+
+We want the topic proportions to be on long format for plotting with **ggplot2**, so we do that now:
+```{r}
+## tidy the Topic proportions
+topicsDF <- transform(
+  setNames(
+    as.data.frame(aberTopics),
+    paste0("Assoc", seq_len(k.take)[rank(-visArea(aberTopics, aber))])
+  ),
+  Age = aberAge$Age
+)
+topicsDF <- gather(topicsDF, Assoc, Proportion, - Age)
+```
+
+Now we reorder the topics on the basis of their time weighted average optima:
+```{r}
+## reorder the topics in increasing order of WA optims for "time"
+topicsDF <- transform(
+  topicsDF,
+  Assoc = factor(Assoc, levels = paste0("Assoc", names(sort(lda_waopt))))
+)
+```
+
+And finally we can plot:
+```{r}
+ggplot(topicsDF, aes(x = Age, y = Proportion, group = Assoc, colour = Assoc)) +
+    geom_line(size = 1) + labs(x = "Radiocarbon years BP") +
+    theme(legend.position = "none") + facet_grid(Assoc ~ .) +
+    scale_x_reverse()
+```
+
+## Dirichlet regression
+
+We note that the output is still very noisy. While we have achieved dimension reduction in the sense that now we have just six "taxa" to explore, we still need to consider statistically how the proportions of these taxa vary over time.
+
+To do that, we will fit a Dirichlet regression model. Here we will use the **DirchletReg** package as it is easier to get working with, but it lacks some of the things we would really like to use, such as the ability to include *penalized* splines. In the slides I used the **brms** package to fit the Dirichlet model, which allows use to fit penalized splines just like a GAM.
+
+To fit the model, we prepare the data using the `DR_data()` function and then use this as the response object in the formula we pass to the `DirichReg()` function:
+```{r}
+y_response <- DR_data(aberTopics)
+topicm_dirch <- DirichReg(y_response ~ ns(-Age, df = 10), data = aberAge)
+```
+Note that we use a natural B spline here for time (`Age`) and we ask for 10 degrees of freedom; this is not a penalized spline, so the fitted smooths will use 10 degrees of freedom, so there is ample opportunity to over fit here. This is the problem that fitting with **brms** would solve.
+
+There is little useful information we can extract in text form from this model as we only have spline terms. So we move straight to visualising the estimated trends in the topic proportions:
+
+```{r}
+## predict from the model
+newAge <- with(aberAge, data.frame(Age = seq(min(Age), max(Age), length = 200)))
+topicm_dirch_p <- predict(topicm_dirch, newdata = newAge,
+                          alpha = FALSE, mu = TRUE)
+names(topicm_dirch_p) <- paste('Assoc', 1:5)
+dirreg_pred <- cbind(newAge, topicm_dirch_p)
+
+dirreg_pred <- gather(dirreg_pred, Association, Proportion, -Age)
+```
+which we then plot:
+```{r}
+ggplot(dirreg_pred, aes(x = Age, y = Proportion, colour = Association)) +
+    geom_line() +
+    scale_x_reverse()
+```
+
+```{r}
+ggplot(dirreg_pred, aes(x = Age, y = Proportion, fill = Association)) +
+    geom_area(position = 'stack', colour = 'black') +
+    scale_x_reverse()
+```
+
+## Correlated topic models
+
+In the `LDA()`, the topics are uncorrelated. In reality, especially with ecological data, we might expect the probability for topic depends on one or more other topics; i.e. one association of species tends to be found with another association.
+
+We can fit this model efficiently by moving to using a *structural topic model* via the **stm** package. With no coavriates a structural topic model (STM) is a correlated topic model.
+
+We read the species data into the format `stm()` requires:
+```{r}
+## convert to a corpus
+corpus <- readCorpus(aber, type = "dtm")
+```
+
+Then we do the fitting of topic models for $j \in {2, 3, \dots, 10}$ topics:
+
+```{r}
+#| message: false
+## how many topics
+stms <- searchK(
+  documents = corpus$documents,
+  vocab = corpus$vocab,
+  K = 2:10,
+  max.em.its = 200,
+  init.type = "Spectral",
+  heldout.seed = 2026-6-18,
+  cores = 4,
+  verbose = FALSE
+)
+```
+
+Then we can plot some diagnostics for these nine models:
+```{r}
+## plot
+plot(stms)
+```
+The best of these diagnostics from out point of view is the heldout likelihood. This suggests that we after six topics we see no further improvement in the model fit to the data, so we will proceed with a CTM using six topics:
+
+```{r}
+#| message: false
+## fit the STM
+tictoc::tic()
+fit <- stm(
+  documents = corpus$documents,
+  vocab = corpus$vocab,
+  K = 6,
+  max.em.its = 200,
+  init.type = "Spectral",
+  seed = 2026-6-18,
+  verbose = FALSE
+)
+tictoc::toc()
+```
+
+We can print out the taxa that are most prevalent in each topic:
+```{r}
+## what taxa characterise each topic?
+labelTopics(fit)
+```
+
+And we can now also pass the output from the fitted STM to the *LDAvis* package to visualise the topics
+```{r}
+#| eval: false
+toLDAvis(mod = fit, docs = corpus$documents)
+```
+
+We now model the estimated topic proportions using the Dirichlet regression:
+```{r}
+## Model the topic proportions using Dirichlet regression
+aberTopics <- fit$theta
+y_response <- DR_data(aberTopics)
+topicm_dirch <- DirichReg(y_response ~ ns(-Age, df = 10), data = aberAge)
+```
+
+And again prepare the outputs for plotting
+```{r}
+newAge <- with(aberAge, data.frame(Age = seq(min(Age), max(Age), length = 200)))
+topicm_dirch_p <- predict(topicm_dirch, newdata = newAge,
+                          alpha = FALSE, mu = TRUE)
+names(topicm_dirch_p) <- paste('Assoc', 1:5)
+dirreg_pred <- cbind(newAge, topicm_dirch_p)
+
+dirreg_pred <- gather(dirreg_pred, Association, Proportion, -Age)
+```
+
+and plot:
+```{r}
+ggplot(dirreg_pred, aes(x = Age, y = Proportion, colour = Association)) +
+    geom_line() +
+    scale_x_reverse()
+```
+
+```{r}
+ggplot(dirreg_pred, aes(x = Age, y = Proportion, fill = Association)) +
+    geom_area(position = 'stack', colour = 'black') +
+    scale_x_reverse()
+```
+
+## Other things
+
+Could use brms package to fit the Dirichlet regression using penalised splines
+so selecting how wiggly or smoothly over time are the trends in the topic proportions.
+
+We can also fit models to guide the topic proportions; for example, if we think the prevalence of the topics has changed over time, perhaps one or more of the associations was more prevalent in the past, we could model the prevalance using a (unpenalized) smooth of time:
+
+```{r}
+#| message: false
+fit_stm <- stm(
+  documents = corpus$documents,
+  vocab = corpus$vocab,
+  K = 5,
+  prevalence = ~ s(Age),
+  data = aberAge,
+  max.em.its = 200,
+  init.type = "Spectral",
+  seed = 2026-6-18,
+  verbose = FALSE
+)
+```
