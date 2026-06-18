@@ -31,3 +31,9 @@ Unless stated otherwise, all training materials in this repository are licensed 
 * [Vegan exercise](https://gavinsimpson.github.io/palaeopen-sofia-2026/03-vegan/01-vegan-exercise.html)
 
 * [Vegan exercise](https://gavinsimpson.github.io/palaeopen-sofia-2026/03-vegan/02-vegan-exercise-2.html)
+
+### Thursday
+
+* Slides on the [fancy stuff](https://gavinsimpson.github.io/palaeopen-sofia-2026/04-fancy-stuff/fancy-stuff.html)
+
+* [Fancy stuff exercise](https://gavinsimpson.github.io/palaeopen-sofia-2026/04-fancy-stuff/01-fancy-stuff-exercise.html)
